@@ -115,7 +115,7 @@ function noiseBurst(dest: GainNode, dur: number, gain = 0.05, at = 0) {
 }
 
 export function playSfx(
-  kind: "jump" | "land" | "collect" | "hurt" | "stinger" | "whisper" | "click" | "type" | "stare",
+  kind: "jump" | "land" | "collect" | "hurt" | "stinger" | "whisper" | "click" | "type" | "stare" | "checkpoint",
 ) {
   if (!bus || !sfxOn) return;
   const dest = bus.sfx;
@@ -156,6 +156,11 @@ export function playSfx(
       tone(dest, "sine", 90, 1.2, 0.08);
       tone(dest, "sawtooth", 40, 0.8, 0.05);
       noiseBurst(dest, 0.9, 0.07);
+      break;
+    case "checkpoint":
+      tone(dest, "sine", 520, 0.14, 0.055);
+      tone(dest, "sine", 780, 0.18, 0.045, 0.08);
+      tone(dest, "triangle", 1040, 0.24, 0.035, 0.16);
       break;
   }
 }
