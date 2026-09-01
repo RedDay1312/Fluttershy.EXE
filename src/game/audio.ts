@@ -93,6 +93,73 @@ function noiseBurst(dest: GainNode, dur: number, gain = 0.05, at = 0) {
   src.connect(f); f.connect(g); g.connect(dest); src.start(t0); src.stop(t0 + dur);
 }
 
+function filteredNoise(dest: GainNode, dur: number, gain: number, frequency: number, at = 0) {
+  if (!bus) return;
+  const t0 = bus.ctx.currentTime + at;
+  const len = Math.max(1, Math.floor(bus.ctx.sampleRate * dur));
+  const buffer = bus.ctx.createBuffer(1, len, bus.ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  let last = 0;
+  for (let i = 0; i < len; i++) {
+    last = last * 0.82 + (Math.random() * 2 - 1) * 0.18;
+    data[i] = last;
+  }
+  const src = bus.ctx.createBufferSource();
+  const f = bus.ctx.createBiquadFilter();
+  const g = bus.ctx.createGain();
+  src.buffer = buffer;
+  f.type = "bandpass";
+  f.frequency.value = frequency;
+  f.Q.value = 0.8;
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.linearRampToValueAtTime(gain, t0 + Math.min(0.08, dur * 0.25));
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  src.connect(f); f.connect(g); g.connect(dest);
+  src.start(t0); src.stop(t0 + dur + 0.03);
+}
+
+function organicHorror(kind: "knock" | "rustle" | "steps" | "breath" | "snap" | "drone" | "sting") {
+  if (!bus || !sfxOn) return;
+  const dest = bus.sfx;
+  switch (kind) {
+    case "knock":
+      tone(dest, "sine", 92 + Math.random() * 10, 0.09, 0.055);
+      tone(dest, "triangle", 185, 0.05, 0.025, 0.045);
+      break;
+    case "rustle":
+      filteredNoise(dest, 0.34 + Math.random() * 0.22, 0.045, 520 + Math.random() * 280);
+      break;
+    case "steps":
+      tone(dest, "sine", 72, 0.09, 0.035);
+      noiseBurst(dest, 0.06, 0.018, 0.025);
+      tone(dest, "sine", 58, 0.085, 0.028, 0.22);
+      noiseBurst(dest, 0.05, 0.014, 0.245);
+      break;
+    case "breath":
+      filteredNoise(dest, 0.95, 0.038, 720);
+      tone(dest, "sine", 155, 0.9, 0.012);
+      break;
+    case "snap":
+      noiseBurst(dest, 0.055, 0.07);
+      tone(dest, "triangle", 150, 0.12, 0.045);
+      break;
+    case "drone":
+      tone(dest, "sine", 43, 1.6, 0.055);
+      tone(dest, "sawtooth", 86, 0.9, 0.012);
+      break;
+    case "sting":
+      tone(dest, "sawtooth", 48, 0.32, 0.085);
+      tone(dest, "square", 132, 0.18, 0.035, 0.025);
+      noiseBurst(dest, 0.16, 0.05);
+      break;
+  }
+}
+
+export function playHorrorSfx(kind: "knock" | "rustle" | "steps" | "breath" | "snap" | "drone" | "sting") {
+  if (!bus || !sfxOn) return;
+  organicHorror(kind);
+}
+
 export function playSfx(kind: "jump" | "land" | "collect" | "hurt" | "stinger" | "whisper" | "click" | "type" | "stare" | "checkpoint" | "respawn") {
   if (!bus || !sfxOn) return;
   const dest = bus.sfx;
