@@ -1,14 +1,135 @@
-export const STORY_VERSION=1;
-export type StoryFlag="noticed_cottage"|"first_break"|"saw_watcher"|"system_revealed"|"friends_lost"|"survived_freeze"|"crossed_void"|"saw_core"|"cursor_rejected"|"desktop_seen"|"body_broken"|"final_break"|"final_gate";
-export type StoryState={version:number;flags:Record<StoryFlag,boolean>;chapter:number;fear:number;mercy:number;truth:number};
-const KEY="waiting.exe.story.v1";
-const FLAGS:StoryFlag[]=["noticed_cottage","first_break","saw_watcher","system_revealed","friends_lost","survived_freeze","crossed_void","saw_core","cursor_rejected","desktop_seen","body_broken","final_break","final_gate"];
-export function defaultStory():StoryState{return{version:STORY_VERSION,flags:Object.fromEntries(FLAGS.map(f=>[f,false])) as Record<StoryFlag,boolean>,chapter:1,fear:0,mercy:0,truth:0};}
-export function loadStory():StoryState{try{const raw=localStorage.getItem(KEY);if(!raw)return defaultStory();const base=defaultStory(),s=JSON.parse(raw) as Partial<StoryState>;return{...base,...s,version:STORY_VERSION,flags:{...base.flags,...s.flags}}}catch{return defaultStory();}}
-export function saveStory(s:StoryState){try{localStorage.setItem(KEY,JSON.stringify(s));}catch{/* private mode */}}
-export function setStoryFlag(flag:StoryFlag,value=true){const s=loadStory();s.flags[flag]=value;saveStory(s);return s;}
-export function advanceStory(chapter:number,fear:number){const s=loadStory();s.chapter=Math.max(s.chapter,chapter);s.fear=Math.max(s.fear,fear);saveStory(s);return s;}
-export function recordMercy(amount=1){const s=loadStory();s.mercy=Math.max(0,s.mercy+amount);saveStory(s);return s;}
-export function recordTruth(amount=1){const s=loadStory();s.truth=Math.max(0,s.truth+amount);saveStory(s);return s;}
-export function resetStory(){const s=defaultStory();saveStory(s);return s;}
-export function endingFromStory(){const s=loadStory();const f=s.flags;const truth=[f.noticed_cottage,f.system_revealed,f.survived_freeze,f.saw_core,f.desktop_seen].filter(Boolean).length;const mercy=[f.noticed_cottage,f.cursor_rejected,f.survived_freeze,f.crossed_void].filter(Boolean).length;if(f.final_gate&&truth>=4&&mercy>=3)return"kind" as const;if(f.final_gate&&mercy>=2)return"escape" as const;if(f.final_break&&s.fear>=5)return"merge" as const;return"loop" as const;}
+export const STORY_VERSION = 2;
+export type StoryFlag =
+  | "noticed_cottage"
+  | "first_break"
+  | "saw_watcher"
+  | "system_revealed"
+  | "friends_lost"
+  | "survived_freeze"
+  | "crossed_void"
+  | "saw_core"
+  | "cursor_rejected"
+  | "desktop_seen"
+  | "body_broken"
+  | "final_break"
+  | "final_gate";
+
+export type StoryState = {
+  version: number;
+  flags: Record<StoryFlag, boolean>;
+  chapter: number;
+  fear: number;
+  mercy: number;
+  truth: number;
+};
+
+const KEY = "waiting.exe.story.v2";
+const FLAGS: StoryFlag[] = [
+  "noticed_cottage",
+  "first_break",
+  "saw_watcher",
+  "system_revealed",
+  "friends_lost",
+  "survived_freeze",
+  "crossed_void",
+  "saw_core",
+  "cursor_rejected",
+  "desktop_seen",
+  "body_broken",
+  "final_break",
+  "final_gate",
+];
+
+export function defaultStory(): StoryState {
+  return {
+    version: STORY_VERSION,
+    flags: Object.fromEntries(FLAGS.map((flag) => [flag, false])) as Record<StoryFlag, boolean>,
+    chapter: 1,
+    fear: 0,
+    mercy: 0,
+    truth: 0,
+  };
+}
+
+export function loadStory(): StoryState {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return defaultStory();
+    const saved = JSON.parse(raw) as Partial<StoryState>;
+    const base = defaultStory();
+    return {
+      ...base,
+      ...saved,
+      version: STORY_VERSION,
+      flags: { ...base.flags, ...(saved.flags ?? {}) },
+    };
+  } catch {
+    return defaultStory();
+  }
+}
+
+export function saveStory(state: StoryState) {
+  try {
+    localStorage.setItem(KEY, JSON.stringify({ ...state, version: STORY_VERSION }));
+  } catch {
+    /* private mode */
+  }
+}
+
+export function setStoryFlag(flag: StoryFlag, value = true) {
+  const state = loadStory();
+  state.flags[flag] = value;
+  saveStory(state);
+  return state;
+}
+
+export function advanceStory(chapter: number, fear: number) {
+  const state = loadStory();
+  state.chapter = Math.max(state.chapter, chapter);
+  state.fear = Math.max(state.fear, fear);
+  saveStory(state);
+  return state;
+}
+
+export function recordMercy(amount = 1) {
+  const state = loadStory();
+  state.mercy = Math.max(0, state.mercy + amount);
+  saveStory(state);
+  return state;
+}
+
+export function recordTruth(amount = 1) {
+  const state = loadStory();
+  state.truth = Math.max(0, state.truth + amount);
+  saveStory(state);
+  return state;
+}
+
+export function resetStory() {
+  const state = defaultStory();
+  saveStory(state);
+  return state;
+}
+
+export function endingFromStory(): "kind" | "escape" | "merge" | "loop" {
+  const state = loadStory();
+  const flags = state.flags;
+  const truth = [
+    flags.noticed_cottage,
+    flags.system_revealed,
+    flags.survived_freeze,
+    flags.saw_core,
+    flags.desktop_seen,
+  ].filter(Boolean).length;
+  const mercy = [
+    flags.noticed_cottage,
+    flags.cursor_rejected,
+    flags.survived_freeze,
+    flags.crossed_void,
+  ].filter(Boolean).length;
+
+  if (flags.final_gate && truth >= 4 && mercy >= 3) return "kind";
+  if (flags.final_gate && mercy >= 2) return "escape";
+  if (flags.final_break && state.fear >= 5) return "merge";
+  return "loop";
+}
