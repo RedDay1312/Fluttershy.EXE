@@ -42,16 +42,18 @@ export function installInput(target: Window | Document = window) {
     held.delete(e.code);
   };
   const clear = () => held.clear();
+  const visibility = () => {
+    if (document.hidden) clear();
+  };
   target.addEventListener("keydown", down as EventListener);
   target.addEventListener("keyup", up as EventListener);
   window.addEventListener("blur", clear);
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) clear();
-  });
+  document.addEventListener("visibilitychange", visibility);
   return () => {
     target.removeEventListener("keydown", down as EventListener);
     target.removeEventListener("keyup", up as EventListener);
     window.removeEventListener("blur", clear);
+    document.removeEventListener("visibilitychange", visibility);
   };
 }
 
