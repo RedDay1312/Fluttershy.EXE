@@ -2,9 +2,8 @@ import { bridge } from "./bridge";
 import { useGameStore } from "@/store/game-store";
 
 /**
- * Small reactive horror layer: the game comments on what the player actually does.
- * It deliberately reuses existing whisper lines so it needs no new UI and stays
- * compatible with the current Russian localization.
+ * Reactive horror layer. The game comments on what the player actually does,
+ * then escalates into harsher reactions after repeated deaths and late levels.
  */
 let cooldownUntil = 0;
 const seen = new Set<string>();
@@ -16,8 +15,25 @@ function address(key: string, onceKey: string, force = false) {
   if (!force && seen.has(token)) return;
   if (!force && now < cooldownUntil) return;
   seen.add(token);
-  cooldownUntil = now + 3600;
+  cooldownUntil = now + 3200;
   useGameStore.getState().setWhisper(key);
+}
+
+function violentAftermath(deaths: number) {
+  const s = useGameStore.getState();
+  // Escalation is deliberately sparse: aftermath, not constant jump scares.
+  if (deaths === 2) {
+    s.showOverlay("red", "red.1", 850);
+    s.setShake(true);
+  } else if (deaths === 4) {
+    s.showOverlay("red", "red.4", 1100);
+    s.setShake(true);
+    address("whisper.5", "death-four-aftermath", true);
+  } else if (deaths >= 6 && deaths % 3 === 0) {
+    s.showOverlay("black", "black.1", 1400);
+    s.setShake(true);
+    address("whisper.3", `death-${deaths}-aftermath`, true);
+  }
 }
 
 bridge.on((event) => {
@@ -37,9 +53,12 @@ bridge.on((event) => {
         address("whisper.3", `collect-${event.kind}`);
       }
       break;
-    case "died":
-      address(s.deaths >= 3 ? "whisper.4" : "whisper.2", `death-${Math.min(3, s.deaths + 1)}`);
+    case "died": {
+      const deaths = s.deaths + 1;
+      address(deaths >= 3 ? "whisper.4" : "whisper.2", `death-${Math.min(3, deaths)}`);
+      violentAftermath(deaths);
       break;
+    }
     case "level-clear":
       address(
         event.level >= 6
@@ -53,6 +72,14 @@ bridge.on((event) => {
                 : "whisper.2",
         `level-${event.level}`,
       );
+      if (event.level >= 4) {
+        window.setTimeout(() => {
+          const current = useGameStore.getState();
+          if (current.phase === "desktop" || current.phase === "playing") {
+            current.showOverlay("red", event.level >= 6 ? "red.8" : "red.2", 900);
+          }
+        }, 1200);
+      }
       break;
     case "pause-request":
       address("whisper.6", "pause", true);
