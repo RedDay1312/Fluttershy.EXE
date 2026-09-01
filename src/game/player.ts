@@ -14,6 +14,7 @@ const FRICTION = 2400;
 const MAX_SPEED = 310;
 const CUT = 0.48;
 const WALL_JUMP = -780;
+const RESPAWN_INVULN = 1250;
 
 export class Pony {
   sprite: Phaser.Physics.Arcade.Sprite;
@@ -28,6 +29,7 @@ export class Pony {
   facing = 1;
   wasGrounded = false;
   idleMs = 0;
+  invulnerableMs = 0;
   canWallJump = false;
   jumpHeldPrev = false;
   onLand?: () => void;
@@ -60,19 +62,20 @@ export class Pony {
   }
 
   look(ms = 2200) {
-    if (this.dead) return;
+    if (this.dead || this.invulnerableMs > 0) return;
     this.looking = true;
     this.lock(true);
     this.sprite.play("fs-look-anim", true);
     this.onLook?.();
     this.sprite.scene.time.delayedCall(ms, () => {
+      if (this.dead) return;
       this.looking = false;
       this.lock(false);
     });
   }
 
   hurt() {
-    if (this.hurtT > 0 || this.dead) return;
+    if (this.hurtT > 0 || this.dead || this.invulnerableMs > 0) return;
     this.hurtT = 420;
     this.sprite.play("fs-hurt-anim", true);
     this.sprite.setTint(0xff8888);
@@ -86,6 +89,7 @@ export class Pony {
     this.locked = false;
     this.gravitySign = 1;
     this.idleMs = 0;
+    this.invulnerableMs = RESPAWN_INVULN;
     this.jumpHeldPrev = false;
     this.sprite.setPosition(x, y);
     this.sprite.setVelocity(0, 0);
@@ -103,6 +107,13 @@ export class Pony {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
     const ms = dt * 1000;
     if (this.hurtT > 0) this.hurtT -= ms;
+    if (this.invulnerableMs > 0) {
+      this.invulnerableMs = Math.max(0, this.invulnerableMs - ms);
+      const pulse = 0.48 + Math.abs(Math.sin(this.invulnerableMs / 90)) * 0.52;
+      this.sprite.setAlpha(this.invulnerableMs < 220 ? 1 : pulse);
+    } else if (this.sprite.alpha !== 1) {
+      this.sprite.setAlpha(1);
+    }
 
     if (this.locked || this.dead) {
       body.setVelocityX(0);
@@ -166,16 +177,6 @@ export class Pony {
 
     if (onGround && !this.wasGrounded) this.onLand?.();
     this.wasGrounded = onGround;
-
-    if (onGround && Math.abs(body.velocity.x) < 24 && !actions.jump) {
-      this.idleMs += ms;
-      if (this.idleMs > 7800) {
-        this.idleMs = 0;
-        this.look(2000);
-      }
-    } else {
-      this.idleMs = 0;
-    }
 
     this.animate(onGround, body.velocity.x, body.velocity.y);
   }
