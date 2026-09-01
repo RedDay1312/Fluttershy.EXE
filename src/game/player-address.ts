@@ -1,4 +1,5 @@
 import { bridge } from "./bridge";
+import { playHorrorSfx, hushMusic } from "./audio";
 import { useGameStore } from "@/store/game-store";
 
 /**
@@ -21,15 +22,34 @@ function address(key: string, onceKey: string, force = false) {
 
 function violentAftermath(deaths: number) {
   const s = useGameStore.getState();
-  // Escalation is deliberately sparse: aftermath, not constant jump scares.
+  if (deaths === 1) {
+    playHorrorSfx("impact");
+    return;
+  }
   if (deaths === 2) {
+    playHorrorSfx("impact");
+    playHorrorSfx("heartbeat");
     s.showOverlay("red", "red.1", 850);
     s.setShake(true);
+  } else if (deaths === 3) {
+    playHorrorSfx("scream");
+    hushMusic(0.9);
+    s.showOverlay("red", "red.2", 900);
+    s.setShake(true);
   } else if (deaths === 4) {
+    playHorrorSfx("impact");
+    playHorrorSfx("heartbeat");
+    hushMusic(1.3);
     s.showOverlay("red", "red.4", 1100);
     s.setShake(true);
     address("whisper.5", "death-four-aftermath", true);
+  } else if (deaths >= 5 && deaths < 7) {
+    playHorrorSfx("breath");
+    s.setShake(true);
   } else if (deaths >= 6 && deaths % 3 === 0) {
+    playHorrorSfx("scream");
+    playHorrorSfx("impact");
+    hushMusic(2.2);
     s.showOverlay("black", "black.1", 1400);
     s.setShake(true);
     address("whisper.3", `death-${deaths}-aftermath`, true);
@@ -49,9 +69,7 @@ bridge.on((event) => {
       break;
     }
     case "collect":
-      if (event.kind === "letter" || event.kind === "gem") {
-        address("whisper.3", `collect-${event.kind}`);
-      }
+      if (event.kind === "letter" || event.kind === "gem") address("whisper.3", `collect-${event.kind}`);
       break;
     case "died": {
       const deaths = s.deaths + 1;
@@ -60,38 +78,18 @@ bridge.on((event) => {
       break;
     }
     case "level-clear":
-      address(
-        event.level >= 6
-          ? "whisper.3"
-          : event.level >= 4
-            ? "whisper.4"
-            : event.level === 2
-              ? "whisper.5"
-              : event.level === 1
-                ? "whisper.1"
-                : "whisper.2",
-        `level-${event.level}`,
-      );
+      address(event.level >= 6 ? "whisper.3" : event.level >= 4 ? "whisper.4" : event.level === 2 ? "whisper.5" : event.level === 1 ? "whisper.1" : "whisper.2", `level-${event.level}`);
       if (event.level >= 4) {
         window.setTimeout(() => {
           const current = useGameStore.getState();
-          if (current.phase === "desktop" || current.phase === "playing") {
-            current.showOverlay("red", event.level >= 6 ? "red.8" : "red.2", 900);
-          }
+          if (current.phase === "desktop" || current.phase === "playing") current.showOverlay("red", event.level >= 6 ? "red.8" : "red.2", 900);
         }, 1200);
       }
       break;
-    case "pause-request":
-      address("whisper.6", "pause", true);
-      break;
-    case "cursor-flee":
-      address("whisper.4", "cursor-flee", true);
-      break;
-    case "ending":
-      address("whisper.3", "ending", true);
-      break;
-    default:
-      break;
+    case "pause-request": address("whisper.6", "pause", true); playHorrorSfx("breath"); break;
+    case "cursor-flee": address("whisper.4", "cursor-flee", true); playHorrorSfx("rustle"); break;
+    case "ending": address("whisper.3", "ending", true); playHorrorSfx("scream"); break;
+    default: break;
   }
 });
 
@@ -99,12 +97,7 @@ let lastWindow = useGameStore.getState().osWindow;
 useGameStore.subscribe((state) => {
   if (state.osWindow === lastWindow) return;
   lastWindow = state.osWindow;
-
-  if (state.osWindow === "browser" && state.notes.length >= 2) {
-    address("whisper.2", "open-browser");
-  } else if (state.osWindow === "notes" && state.notes.length >= 3) {
-    address("whisper.3", "open-notes");
-  } else if (state.osWindow === "docs" && state.level >= 4) {
-    address("whisper.6", "open-docs");
-  }
+  if (state.osWindow === "browser" && state.notes.length >= 2) { address("whisper.2", "open-browser"); playHorrorSfx("knock"); }
+  else if (state.osWindow === "notes" && state.notes.length >= 3) { address("whisper.3", "open-notes"); playHorrorSfx("type"); }
+  else if (state.osWindow === "docs" && state.level >= 4) { address("whisper.6", "open-docs"); playHorrorSfx("drone"); }
 });
