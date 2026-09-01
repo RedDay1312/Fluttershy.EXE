@@ -1,7 +1,7 @@
-import { setStoryFlag, advanceStory } from "./story-state";
+import { setStoryFlag, advanceStory, type StoryFlag } from "./story-state";
 import { bridge } from "./bridge";
 
-export type HorrorBeat={level:number;fear:number;event:"glitch"|"flicker"|"distort"|"shake"|"black"|"stare";ms?:number;flag?:string};
+export type HorrorBeat={level:number;fear:number;event:"glitch"|"flicker"|"distort"|"shake"|"black"|"stare";ms?:number;flag?:StoryFlag};
 const BEATS:HorrorBeat[]=[
 {level:1,fear:1,event:"glitch",ms:900,flag:"first_break"},
 {level:2,fear:2,event:"flicker",ms:1200,flag:"saw_watcher"},
@@ -16,7 +16,7 @@ bridge.on(e=>{
  if(e.type!=="level-clear"||e.level===last)return;
  last=e.level;
  const b=BEATS.find(x=>x.level===e.level);if(!b)return;
- advanceStory(e.level,b.fear);if(b.flag)setStoryFlag(b.flag as never);
+ advanceStory(e.level,b.fear);if(b.flag)setStoryFlag(b.flag);
  window.setTimeout(()=>{
   if(b.event==="black")bridge.emit({type:"overlay",kind:"black",textKey:"black.2",ms:b.ms});
   else if(b.event==="stare")bridge.emit({type:"overlay",kind:"stare",ms:b.ms});
