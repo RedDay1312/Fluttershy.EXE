@@ -5,7 +5,19 @@ function cloneDecor(items: Decor[], offset: number, pass: number): Decor[] {
 }
 function clonePlatforms(items: Plat[], offset: number, pass: number): Plat[] { return items.map((p) => ({ ...p, x: p.x + offset, move: p.move ? { ...p.move, period: Math.max(1100, p.move.period * (pass === 1 ? 1 : pass === 2 ? 0.88 : 0.76)) } : undefined })); }
 function cloneHazards(items: Hazard[], offset: number): Hazard[] { return items.map((h) => ({ ...h, x: h.x + offset })); }
-function clonePickups(items: Pickup[], offset: number, level: number, pass: number): Pickup[] { return items.map((p, i) => ({ ...p, x: p.x + offset, id: `${p.id}-echo-${level}-${pass}-${i}` })); }
+function clonePickups(items: Pickup[], offset: number, level: number, pass: number): Pickup[] {
+  return items.filter((p) => p.kind !== "note").map((p, i) => ({ ...p, x: p.x + offset, id: `${p.id}-echo-${level}-${pass}-${i}` }));
+}
+
+const SOURCE_NOTES = LEVELS.flatMap((level) => level.pickups.filter((p) => p.kind === "note")).slice(0, 12);
+const CURATED_NOTE_IDS = new Map(SOURCE_NOTES.map((p, index) => [p.id, `lore-${String(index + 1).padStart(2, "0")}`]));
+
+function curatePickups(items: Pickup[]): Pickup[] {
+  return items.filter((p) => p.kind !== "note" || CURATED_NOTE_IDS.has(p.id)).map((p) => {
+    if (p.kind !== "note") return p;
+    return { ...p, id: CURATED_NOTE_IDS.get(p.id)! };
+  });
+}
 
 function atmosphericDecor(level: LevelDef, offset: number, pass: number): Decor[] {
   const w = level.width, out: Decor[] = [];
@@ -102,6 +114,6 @@ export const EXPANDED_LEVELS: LevelDef[] = LEVELS.map((level) => {
   const echoPickups = offsets.flatMap((offset, index) => clonePickups(level.pickups, offset, level.id, index + 1));
   const echoDecor = offsets.flatMap((offset, index) => [...cloneDecor(level.decor, offset, index + 1), ...atmosphericDecor(level, offset, index + 1)]);
   const echoEvents = offsets.flatMap((offset, index) => makeEchoTriggers(level, offset, index + 1));
-  return { ...level, width: section * 4, exit: { ...level.exit, x: section * 4 - 150 }, platforms: [...level.platforms, ...echoPlatforms], hazards: [...level.hazards, ...echoHazards, ...extraHazards], pickups: [...level.pickups, ...echoPickups], decor: [...level.decor, ...atmosphericDecor(level, 0, 0), ...echoDecor], triggers: [...level.triggers, ...echoEvents], checkpoints: [...level.checkpoints, ...offsets.flatMap((offset) => level.checkpoints.map((c) => ({ x: c.x + offset, y: c.y })))] };
+  return { ...level, width: section * 4, exit: { ...level.exit, x: section * 4 - 150 }, platforms: [...level.platforms, ...echoPlatforms], hazards: [...level.hazards, ...echoHazards, ...extraHazards], pickups: [...curatePickups(level.pickups), ...echoPickups], decor: [...level.decor, ...atmosphericDecor(level, 0, 0), ...echoDecor], triggers: [...level.triggers, ...echoEvents], checkpoints: [...level.checkpoints, ...offsets.flatMap((offset) => level.checkpoints.map((c) => ({ x: c.x + offset, y: c.y })))] };
 });
 export function getExpandedLevel(id: number): LevelDef { return EXPANDED_LEVELS.find((level) => level.id === id) ?? EXPANDED_LEVELS[0]; }
