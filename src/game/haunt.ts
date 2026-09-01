@@ -39,55 +39,71 @@ export const EMPTY_HAUNT: HauntState = {
   taskmgr: false,
 };
 
+/**
+ * Desktop corruption is deliberately staged. Each stage introduces one
+ * new idea instead of dumping every horror effect on the player at once.
+ * Old Angel/crossover content is intentionally gone.
+ */
 export function hauntFor(stage: number): HauntState {
-  if (stage <= 0) return { ...EMPTY_HAUNT };
+  const level = Math.max(0, Math.min(6, Math.floor(stage)));
+  if (level === 0) return { ...EMPTY_HAUNT };
+
   const files: DeskFile[] = [];
   const sticky: string[] = [];
   const recycle: string[] = [];
 
-  if (stage >= 1) {
-    files.push({ id: "cottage", labelKey: "file.cottage", kind: "note", textKey: "desk.type.1" });
-    files.push({ id: "twilight", labelKey: "file.twilight", kind: "note", textKey: "note.10" });
-    sticky.push("sticky.1");
-  }
-  if (stage >= 2) {
+  // 1 — the game starts remembering the player.
+  files.push(
+    { id: "cottage", labelKey: "file.cottage", kind: "note", textKey: "desk.type.1" },
+    { id: "twilight", labelKey: "file.twilight", kind: "note", textKey: "note.10" },
+  );
+  sticky.push("sticky.1");
+
+  // 2 — the world begins watching back.
+  if (level >= 2) {
     files.push({ id: "blink", labelKey: "file.blink", kind: "note", textKey: "desk.type.2" });
-    files.push({ id: "angel", labelKey: "file.angel", kind: "img" });
     sticky.push("sticky.2");
-    recycle.push("angel.bmp");
   }
-  if (stage >= 3) {
+
+  // 3 — familiar things disappear from the save instead of becoming random NPCs.
+  if (level >= 3) {
     files.push({ id: "friends", labelKey: "file.friends", kind: "folder" });
     sticky.push("sticky.3");
     recycle.push("rainbow_dash.dat", "twilight_sparkle.dat", "pinkie_pie.dat", "rarity.dat", "applejack.dat");
   }
-  if (stage >= 4) {
+
+  // 4 — the game itself becomes aware that something is wrong.
+  if (level >= 4) {
     files.push({ id: "sys", labelKey: "file.sys", kind: "sys", textKey: "desk.type.4" });
     sticky.push("sticky.4");
   }
-  if (stage >= 5) {
+
+  // 5 — direct observation, reserved for the late game.
+  if (level >= 5) {
     files.push({ id: "cam", labelKey: "file.cam", kind: "exe" });
     sticky.push("sticky.5");
   }
-  if (stage >= 6) {
+
+  // 6 — the game stops pretending the player is outside the story.
+  if (level >= 6) {
     files.push({ id: "you", labelKey: "file.you", kind: "exe" });
     sticky.push("sticky.6");
   }
 
   return {
-    stage,
+    stage: level,
     files,
     sticky,
     recycle,
-    ponyWalk: stage >= 4,
-    eyes: stage >= 2,
-    bleed: stage >= 3,
-    webcam: stage >= 5,
-    browser: stage >= 5,
-    clockStuck: stage >= 4,
-    iconsScatter: stage >= 5,
-    typingKey: stage >= 1 && stage <= 6 ? `desk.type.${stage}` : null,
-    fakeWindows: stage >= 5 ? 3 : 0,
-    taskmgr: stage >= 4,
+    ponyWalk: level >= 4,
+    eyes: level >= 2,
+    bleed: level >= 3,
+    webcam: level >= 5,
+    browser: level >= 5,
+    clockStuck: level >= 4,
+    iconsScatter: level >= 5,
+    typingKey: level >= 1 && level <= 6 ? `desk.type.${level}` : null,
+    fakeWindows: level >= 5 ? Math.min(2, level - 3) : 0,
+    taskmgr: level >= 4,
   };
 }
