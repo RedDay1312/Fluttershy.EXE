@@ -8,14 +8,16 @@ let sceneTimer: number | null = null;
 let keyHandler: ((e: KeyboardEvent) => void) | null = null;
 let timers = new Set<number>();
 
+// Each scene advances the same story instead of being an isolated scare:
+// silence -> imitation -> observation -> pursuit -> loss of control -> identity theft.
 const SCENES: Record<number, { title: string; text: string; image?: boolean; duration: number }> = {
-  1: { title: "...", text: "Ты ведь только что видел её там?", image: true, duration: 4200 },
-  2: { title: "НЕ СМОТРИ", text: "Они не должны были висеть здесь.", image: true, duration: 4500 },
-  3: { title: "ФЛАТТЕРШАЙ", text: "Она стоит слишком далеко, чтобы ты мог её рассмотреть.\nНо она смотрит прямо на тебя.", image: true, duration: 4700 },
-  4: { title: "Я ЗДЕСЬ", text: "Не оборачивайся.\nНе сейчас.", image: true, duration: 4400 },
-  5: { title: "SYSTEM MESSAGE", text: "PLAYER LOCATION: KNOWN\nOBSERVER: PRESENT\nEXIT: FALSE", duration: 4200 },
-  6: { title: "RUN", text: "Она уже идёт за тобой.\nНа этот раз игра не остановится.", image: true, duration: 4800 },
-  7: { title: "FLUTTERSHY.EXE", text: "Ты дошёл сюда не один.\nОна всё это время была рядом.", image: true, duration: 5000 },
+  1: { title: "Тишина", text: "Понивилль должен быть полон голосов.\nНо сегодня первым тебя встречает пустой дом.\nГде-то внутри кто-то тихо произносит: «Флаттершай…»", image: true, duration: 5000 },
+  2: { title: "НЕ ОТВЕЧАЙ", text: "Ты находишь следы Ангела. Они обрываются у стены.\nЗа стеной слышится царапанье.\nПотом голос Флаттершай просит открыть дверь.", image: true, duration: 5200 },
+  3: { title: "ОНА СМОТРИТ", text: "Между деревьями стоит силуэт.\nТы узнаёшь позу раньше, чем лицо.\nОн повторяет твой последний шаг — с задержкой в несколько секунд.", image: true, duration: 5200 },
+  4: { title: "НЕ ВОЗВРАЩАЙСЯ", text: "Тропа приводит туда, откуда ты уже ушёл.\nНа земле лежат твои собственные следы.\nНо один из них появился раньше тебя.", image: true, duration: 5000 },
+  5: { title: "SYSTEM MESSAGE", text: "MEMORY SAMPLE: FLUTTERSHY\nVOICE SAMPLE: ACQUIRED\nFEAR RESPONSE: ACQUIRED\nEXIT PATH: REWRITTEN", duration: 4700 },
+  6: { title: "БЕГИ", text: "Теперь оно не прячется.\nОно уже знает, как ты двигаешься.\nЕсли увидишь Флаттершай впереди — не подходи к ней.", image: true, duration: 5400 },
+  7: { title: "FLUTTERSHY.EXE", text: "Ты думал, что искал её.\nНо всё это время она училась быть тобой.\nПоследний вопрос уже не «где Флаттершай?», а «кто из вас настоящая?». ", image: true, duration: 6000 },
 };
 
 function later(fn: () => void, ms: number) {
@@ -80,8 +82,8 @@ function runCutscene(level: number) {
 
   const caption = document.createElement("div");
   Object.assign(caption.style, {
-    position: "absolute", left: "8vw", bottom: "16vh", zIndex: "5", maxWidth: "700px", whiteSpace: "pre-line",
-    color: "rgba(220,225,222,.72)", fontFamily: "Georgia, serif", fontSize: "clamp(15px, 2vw, 23px)", lineHeight: "1.65",
+    position: "absolute", left: "8vw", bottom: "16vh", zIndex: "5", maxWidth: "760px", whiteSpace: "pre-line",
+    color: "rgba(220,225,222,.76)", fontFamily: "Georgia, serif", fontSize: "clamp(15px, 2vw, 23px)", lineHeight: "1.65",
     opacity: "0", transform: "translateY(18px)", transition: "opacity 700ms ease 500ms, transform 700ms ease 500ms", textShadow: "0 2px 16px #000",
   });
   caption.textContent = scene.text;
@@ -119,6 +121,8 @@ function runCutscene(level: number) {
   if (level >= 5) later(() => playHorrorSfx("steps"), 900);
   if (level >= 6) later(() => playSfx("stinger"), 2400);
 
+  // Later scenes make the image approach the viewer, then abruptly disappear.
+  // This keeps the reveal restrained instead of turning every cutscene into a jumpscare.
   if (scene.image && level >= 3) {
     later(() => {
       if (!active) return;
