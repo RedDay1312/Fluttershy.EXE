@@ -2,6 +2,7 @@ import * as Phaser from "phaser";
 import { BootScene } from "./scenes/boot-scene";
 import { PlayScene } from "./scenes/play-scene";
 import { PreloadScene } from "./scenes/preload-scene";
+import { SplashScene } from "./scenes/splash-scene";
 
 export function createWaitingGame(parent: HTMLElement, startLevel = 1): Phaser.Game {
   const game = new Phaser.Game({
@@ -24,7 +25,7 @@ export function createWaitingGame(parent: HTMLElement, startLevel = 1): Phaser.G
     },
     render: { antialias: true },
     audio: { disableWebAudio: true },
-    scene: [BootScene, PreloadScene, PlayScene],
+    scene: [BootScene, SplashScene, PreloadScene, PlayScene],
   });
   game.registry.set("startLevel", startLevel);
   return game;
