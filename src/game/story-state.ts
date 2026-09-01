@@ -51,8 +51,28 @@ export function defaultStory(): StoryState {
   };
 }
 
+function isFreshSaveMarker(): boolean {
+  try {
+    const raw = localStorage.getItem("waiting.exe.save.v4");
+    if (!raw) return true;
+    const save = JSON.parse(raw) as { level?: number; notes?: unknown[]; seenIntro?: boolean };
+    return save.level === 1 && Array.isArray(save.notes) && save.notes.length === 0 && save.seenIntro === false;
+  } catch {
+    return true;
+  }
+}
+
 export function loadStory(): StoryState {
   try {
+    // New Game writes a clean level-1 save before the first story trigger.
+    // Treat that marker as the start of a brand-new story and discard prior flags.
+    if (isFreshSaveMarker()) {
+      const fresh = defaultStory();
+      localStorage.setItem(KEY, JSON.stringify(fresh));
+      localStorage.removeItem("waiting.exe.story.v1");
+      return fresh;
+    }
+
     const raw = localStorage.getItem(KEY);
     if (!raw) return defaultStory();
     const saved = JSON.parse(raw) as Partial<StoryState>;
