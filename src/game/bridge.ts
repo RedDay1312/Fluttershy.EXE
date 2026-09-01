@@ -1,4 +1,6 @@
 import { playHorrorSfx, playSfx } from "./audio";
+import { clearInput } from "./input";
+import { LORE_NOTES } from "./lore-notes";
 
 export type OverlayKind =
   | "none" | "bsod" | "red" | "notepad" | "freeze" | "look" | "glitch"
@@ -23,6 +25,7 @@ let checkpointBanner: HTMLDivElement | null = null;
 let checkpointTimer: number | null = null;
 let horrorBusy = false;
 let lastOrganicHorror = 0;
+let loreNoteOpen = false;
 
 function showCheckpointBanner() {
   if (typeof document === "undefined") return;
@@ -38,6 +41,74 @@ function showCheckpointBanner() {
 function horrorLayer(ms: number) {
   if (typeof document === "undefined") return null;
   const el = document.createElement("div"); Object.assign(el.style,{position:"fixed",inset:"0",zIndex:"10000",pointerEvents:"none",overflow:"hidden"}); document.body.appendChild(el); window.setTimeout(()=>el.remove(),ms); return el;
+}
+
+function showLoreNote(id: string) {
+  if (typeof document === "undefined" || loreNoteOpen) return;
+  const note = LORE_NOTES.find((n) => n.id === id);
+  if (!note) return;
+  loreNoteOpen = true;
+  clearInput();
+
+  const overlay = document.createElement("div");
+  const paper = document.createElement("div");
+  const header = document.createElement("div");
+  const title = document.createElement("div");
+  const body = document.createElement("div");
+  const footer = document.createElement("div");
+  const close = document.createElement("button");
+
+  Object.assign(overlay.style, {
+    position:"fixed", inset:"0", zIndex:"12000", display:"flex", alignItems:"center", justifyContent:"center",
+    padding:"clamp(18px, 5vw, 70px)", background:"rgba(2,3,5,.86)", backdropFilter:"blur(5px)",
+    opacity:"0", transition:"opacity 180ms ease", cursor:"default",
+  });
+  overlay.dataset.loreNote = "true";
+
+  Object.assign(paper.style, {
+    position:"relative", width:"min(820px, 92vw)", maxHeight:"min(760px, 88vh)", overflow:"auto",
+    padding:"clamp(28px, 5vw, 56px)", background:"#eee7d4", color:"#211f1a",
+    boxShadow:"0 24px 80px rgba(0,0,0,.65), 0 0 0 1px rgba(255,255,255,.12)",
+    transform:"translateY(18px) scale(.97) rotate(-.35deg)", transition:"transform 220ms cubic-bezier(.18,.8,.2,1)",
+    fontFamily:"Georgia, 'Times New Roman', serif",
+  });
+  Object.assign(header.style, { display:"flex", alignItems:"center", justifyContent:"space-between", gap:"20px", borderBottom:"1px solid rgba(40,35,25,.22)", paddingBottom:"14px", marginBottom:"28px" });
+  Object.assign(title.style, { fontSize:"clamp(18px, 3vw, 27px)", fontWeight:"700", letterSpacing:".02em" });
+  Object.assign(body.style, { fontSize:"clamp(16px, 2vw, 21px)", lineHeight:"1.8", whiteSpace:"pre-wrap", minHeight:"180px" });
+  Object.assign(footer.style, { marginTop:"30px", paddingTop:"14px", borderTop:"1px solid rgba(40,35,25,.15)", display:"flex", alignItems:"center", justifyContent:"space-between", gap:"15px", fontFamily:"IBM Plex Sans, sans-serif", fontSize:"12px", color:"rgba(33,31,26,.62)", letterSpacing:".08em", textTransform:"uppercase" });
+  Object.assign(close.style, { border:"1px solid rgba(33,31,26,.35)", background:"rgba(255,255,255,.3)", color:"#211f1a", padding:"8px 14px", fontFamily:"inherit", fontSize:"12px", cursor:"pointer" });
+
+  const number = LORE_NOTES.findIndex((n) => n.id === id) + 1;
+  title.textContent = note.title;
+  body.textContent = note.body;
+  footer.append(document.createTextNode(`FLUTTERSHY.EXE  •  ${String(number).padStart(2, "0")} / ${LORE_NOTES.length}`));
+  close.textContent = "ЗАКРЫТЬ  [E]";
+  header.append(title, close);
+  paper.append(header, body, footer);
+  overlay.appendChild(paper);
+  document.body.appendChild(overlay);
+
+  const finish = () => {
+    if (!loreNoteOpen) return;
+    loreNoteOpen = false;
+    clearInput();
+    overlay.style.opacity = "0";
+    paper.style.transform = "translateY(12px) scale(.98) rotate(0deg)";
+    window.setTimeout(() => overlay.remove(), 190);
+    window.setTimeout(() => {
+      handlers.forEach((h) => h({ type: "nudge-dialogue" }));
+      handlers.forEach((h) => h({ type: "nudge-dialogue" }));
+    }, 30);
+  };
+
+  close.addEventListener("click", finish);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) finish(); });
+  const onKey = (e: KeyboardEvent) => {
+    if (e.code === "Escape" || e.code === "KeyE" || e.code === "Enter") { e.preventDefault(); e.stopPropagation(); finish(); }
+  };
+  window.addEventListener("keydown", onKey, true);
+  window.setTimeout(() => window.removeEventListener("keydown", onKey, true), 120000);
+  requestAnimationFrame(() => { overlay.style.opacity = "1"; paper.style.transform = "translateY(0) scale(1) rotate(-.35deg)"; });
 }
 
 function spawnWatcher() {
@@ -78,7 +149,7 @@ function deathBurst(){const layer=horrorLayer(420);if(!layer)return;Object.assig
 function shakeScreen(){if(typeof document==="undefined")return;document.body.animate([{transform:"translate(0,0)"},{transform:"translate(-7px,2px)"},{transform:"translate(5px,-3px)"},{transform:"translate(-3px,1px)"},{transform:"translate(0,0)"}],{duration:230,easing:"steps(4,end)"});}
 
 function organicEvent(level: number) {
-  if(typeof document==="undefined" || horrorBusy) return;
+  if(typeof document==="undefined" || horrorBusy || loreNoteOpen) return;
   const now=Date.now();
   const cooldown=level<=2?17000:level<=4?12500:9500;
   if(now-lastOrganicHorror<cooldown)return;
@@ -99,6 +170,7 @@ export const bridge={
   emit(e:BridgeEvent){
     if(e.type==="checkpoint"){playSfx("checkpoint");showCheckpointBanner();}
     if(e.type==="hud") organicEvent(e.level);
+    if(e.type==="note") showLoreNote(e.id);
     if(e.type==="whisper"){
       const roll=Math.random();
       if(roll<.11) screamerBurst(); else if(roll<.58) spawnWatcher(); else playHorrorSfx("breath");
