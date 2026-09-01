@@ -15,7 +15,12 @@ export function createWaitingGame(parent: HTMLElement, startLevel = 1): Phaser.G
     roundPixels: true,
     physics: {
       default: "arcade",
-      arcade: { gravity: { x: 0, y: 0 }, debug: false },
+      arcade: {
+        gravity: { x: 0, y: 0 },
+        debug: false,
+        fps: 60,
+        fixedStep: true,
+      },
     },
     scale: {
       mode: Phaser.Scale.FIT,
@@ -23,7 +28,15 @@ export function createWaitingGame(parent: HTMLElement, startLevel = 1): Phaser.G
       width: 1280,
       height: 720,
     },
-    render: { antialias: true },
+    // Avoid unnecessary texture smoothing work and prefer the GPU when available.
+    render: {
+      antialias: false,
+      antialiasGL: false,
+      roundPixels: true,
+      powerPreference: "high-performance",
+      batchSize: 4096,
+      maxLights: 0,
+    },
     audio: { disableWebAudio: true },
     scene: [BootScene, SplashScene, PreloadScene, PlayScene],
   });
