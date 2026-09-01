@@ -24,13 +24,12 @@ const grass = (a: number, b: number, step = 90, alpha = 1): Decor[] => {
 };
 const eyes = (x: number, y = 520, alpha = 0.65): Decor => ({ x, y, sprite: "eyes", follow: true, sway: true, depth: 8, scale: 0.7, alpha });
 
-// The story is deliberately paced: normal forest -> uneasy forest -> corruption -> reality failure -> final distortion.
-// No companion NPCs, angel, Discord cameos or random desktop gags are used in the level flow.
+// Linear narrative progression: calm forest -> unease -> corruption -> reality failure -> finale.
+// Deliberately no companion NPCs, angel, Discord cameos or unrelated desktop jokes.
 export const LEVELS: LevelDef[] = [
   {
     id: 1, width: 4200, height: H, sky: "/maps/forest-sky.jpg", far: "/maps/forest-far.jpg", plat: "grass",
-    spawn: { x: 180, y: 500 }, exit: { x: 4050, y: G - 168, w: 120, h: 168 },
-    intro: ["d.intro.1", "d.intro.2", "d.intro.3"], npcs: [],
+    spawn: { x: 180, y: 500 }, exit: { x: 4050, y: G - 168, w: 120, h: 168 }, intro: ["d.intro.1", "d.intro.2", "d.intro.3"], npcs: [],
     platforms: [ground(0, 900, "grass"), plat(980, 520, 180, "grass"), plat(1240, 420, 180, "wood"), plat(1500, 520, 200, "grass"), ground(1740, 760, "grass"), plat(1880, 480, 180, "grass"), plat(2140, 380, 180, "wood"), plat(2400, 500, 190, "grass"), ground(2620, 760, "grass"), plat(2800, 480, 190, "wood"), plat(3070, 390, 180, "grass"), plat(3330, 500, 190, "wood"), ground(3550, 650, "grass")],
     hazards: [{ x: 900, y: 680, w: 80, h: 50, kind: "pit" }, { x: 1700, y: 680, w: 40, h: 50, kind: "pit" }, { x: 2580, y: 680, w: 40, h: 50, kind: "pit" }, { x: 3510, y: 680, w: 40, h: 50, kind: "pit" }],
     pickups: [{ x: 420, y: 560, kind: "note", id: "1" }, { x: 1060, y: 470, kind: "butterfly", id: "b1" }, { x: 1320, y: 370, kind: "flower", id: "f1" }, { x: 2020, y: 430, kind: "butterfly", id: "b2" }, { x: 2200, y: 330, kind: "note", id: "2" }, { x: 2910, y: 430, kind: "butterfly", id: "b3" }, { x: 3410, y: 450, kind: "note", id: "3" }],
@@ -61,7 +60,7 @@ export const LEVELS: LevelDef[] = [
   {
     id: 4, width: 4700, height: H, sky: "/maps/void-sky.jpg", far: "/maps/void-far.jpg", plat: "glitch",
     spawn: { x: 180, y: 500 }, exit: { x: 4550, y: G - 168, w: 120, h: 168 }, intro: ["d.l4.start"], npcs: [],
-    platforms: [ground(0, 760, "glitch"), plat(850, 520, 180, "glitch"), plat(1100, 430, 170, "void"), ground(1320, 650, "glitch"), plat(1530, 500, 190, "void"), plat(1800, 400, 180, "glitch"), ground(2020, 620, "glitch"), plat(2250, 490, 190, "void"), mover(2520, 500, 160, "glitch", 0, -130, 2600), plat(2800, 360, 180, "void"), ground(3020, 680, "glitch"), plat(3260, 490, 190, "void"), plat(3530, 380, 180, "glitch"), ground(3750, 600, "glitch""), plat(3970, 480, 180, "void"), plat(4230, 370, 180, "glitch"), ground(4450, 250, "glitch")],
+    platforms: [ground(0, 760, "glitch"), plat(850, 520, 180, "glitch"), plat(1100, 430, 170, "void"), ground(1320, 650, "glitch"), plat(1530, 500, 190, "void"), plat(1800, 400, 180, "glitch"), ground(2020, 620, "glitch"), plat(2250, 490, 190, "void"), mover(2520, 500, 160, "glitch", 0, -130, 2600), plat(2800, 360, 180, "void"), ground(3020, 680, "glitch"), plat(3260, 490, 190, "void"), plat(3530, 380, 180, "glitch"), ground(3750, 600, "glitch"), plat(3970, 480, 180, "void"), plat(4230, 370, 180, "glitch"), ground(4450, 250, "glitch")],
     hazards: [{ x: 760, y: 680, w: 90, h: 50, kind: "pit" }, { x: 1270, y: 680, w: 50, h: 50, kind: "pit" }, { x: 1950, y: 680, w: 70, h: 50, kind: "pit" }, { x: 2950, y: 680, w: 70, h: 50, kind: "pit" }, { x: 3680, y: 680, w: 70, h: 50, kind: "pit" }, { x: 4380, y: 680, w: 70, h: 50, kind: "pit" }],
     pickups: [{ x: 1160, y: 380, kind: "note", id: "12" }, { x: 1850, y: 350, kind: "note", id: "13" }, { x: 2840, y: 310, kind: "note", id: "14" }, { x: 4040, y: 430, kind: "note", id: "15" }],
     decor: [eyes(980, 500, 0.55), eyes(2150, 500, 0.5), eyes(3180, 480, 0.45), eyes(4050, 470, 0.4)],
@@ -82,7 +81,7 @@ export const LEVELS: LevelDef[] = [
     id: 6, width: 4800, height: H, sky: "/maps/glitch-far.jpg", far: "/maps/glitch-far.jpg", plat: "void",
     spawn: { x: 180, y: 500 }, exit: { x: 4650, y: G - 168, w: 120, h: 168 }, intro: ["d.l6.1", "d.l6.2"], gravity: 1, npcs: [],
     platforms: [ground(0, 720, "void"), plat(800, 510, 170, "glitch"), plat(1050, 410, 170, "void"), ground(1290, 620, "void"), plat(1500, 500, 180, "glitch"), plat(1770, 390, 170, "void"), ground(1990, 650, "void"), plat(2220, 480, 180, "glitch"), mover(2480, 500, 170, "glitch", 0, -150, 2500), plat(2780, 350, 180, "void"), ground(3000, 680, "void"), plat(3230, 480, 190, "glitch"), plat(3510, 360, 180, "void"), ground(3730, 650, "void"), plat(3980, 480, 180, "glitch"), plat(4250, 350, 180, "void"), ground(4470, 250, "void")],
-    hazards: [{ x: 720, y: 680, w: 80, h: 50, kind: "pit" }, { x: 1220, y: 680, w: 70, h: 50, kind: "pit" }, { x: 1910, y: 680, w: 80, h: 50, kind: "pit" }, { x: 2920, y: 680, w: 80, h: 50, kind: "pit" }, { x: 3650, y: 680, w: 80, h: 50, kind: "pit" }, { x: 4390, y: 680, w: 80, h: 50, kind: "pit" }],
+    hazards: [{ x: 720, y: 680, w: 80, h: 50, kind: "pit" }, { x: 1220, y: 680, w: 70, h: 50, kind: "pit" }, { x: 1910, y: 680, w: 80, h: 50, kind: "pit" }, { x: 2920, y: 680, w: 80, h: 50, kind: "pit" }, { x: 3650, y: 680, w: 80, h: 50, kind: "pit" }, { x: 4390, y: 680, w: 60, h: 50, kind: "pit" }],
     pickups: [{ x: 1120, y: 360, kind: "gem", id: "22" }, { x: 1810, y: 340, kind: "note", id: "23" }, { x: 2860, y: 300, kind: "gem", id: "24" }, { x: 4070, y: 430, kind: "mark", id: "m6" }],
     decor: [eyes(950, 500, 0.45), eyes(2100, 500, 0.4), eyes(3100, 470, 0.35), eyes(4000, 450, 0.3)],
     checkpoints: [{ x: 180, y: 500 }, { x: 1290, y: 500 }, { x: 1990, y: 500 }, { x: 3000, y: 500 }, { x: 3730, y: 500 }],
@@ -99,6 +98,4 @@ export const LEVELS: LevelDef[] = [
   }
 ];
 
-export function getLevel(id: number): LevelDef {
-  return LEVELS.find((l) => l.id === id) ?? LEVELS[0];
-}
+export function getLevel(id: number): LevelDef { return LEVELS.find((l) => l.id === id) ?? LEVELS[0]; }
