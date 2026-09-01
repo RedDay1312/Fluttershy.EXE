@@ -16,7 +16,8 @@ export class PreloadScene extends Phaser.Scene {
       fontFamily: "Cormorant Garamond, serif", fontSize: "48px", color: "#efe6d6"
     }).setOrigin(0.5);
     this.status = this.add.text(w / 2, h / 2 - 8, "loading...", {
-      fontFamily: "IBM Plex Sans, sans-serif", fontSize: "14px", color: "#9a9388"
+      fontFamily: "IBM Plex Sans, sans-serif", fontSize: "14px", color: "#9a9388", align: "center",
+      wordWrap: { width: 900 },
     }).setOrigin(0.5);
     this.add.rectangle(w / 2, h / 2 + 36, 420, 8, 0x2a2a32).setOrigin(0.5);
     this.bar = this.add.rectangle(w / 2 - 210, h / 2 + 36, 4, 8, 0x7ec8c9).setOrigin(0, 0.5);
@@ -58,9 +59,9 @@ export class PreloadScene extends Phaser.Scene {
 
   create() {
     if (this.loadErrors.length) {
-      const details = this.loadErrors.slice(0, 6).join("\n");
-      this.status?.setColor("#ff6b6b").setText(`asset error\n${details}`);
-      bridge.emit({ type: "game-error", message: `Asset loading failed:\n${details}` });
+      const details = this.loadErrors.slice(0, 8).join("\n");
+      this.status?.setColor("#ff6b6b").setText(`ASSET ERROR\n\n${details}\n\nOpen DevTools (F12) → Console for details.`);
+      console.error("[Fluttershy.EXE] Preload aborted because assets failed:", this.loadErrors);
       return;
     }
 
@@ -68,17 +69,26 @@ export class PreloadScene extends Phaser.Scene {
       if (this.anims.exists(key)) return;
       const texture = this.textures.get(tex);
       if (!texture || texture.key === "__MISSING") {
-        throw new Error(`Required texture missing: ${tex}`);
+        this.status?.setColor("#ff6b6b").setText(`TEXTURE ERROR\n\nMissing texture: ${tex}`);
+        console.error(`[Fluttershy.EXE] Required texture missing: ${tex}`);
+        return false;
       }
       this.anims.create({ key, frames: this.anims.generateFrameNumbers(tex, { start: 0, end }), frameRate: rate, repeat });
+      return true;
     };
-    mk("fs-idle-anim", "fs-idle", 3, 5, -1);
-    mk("fs-run-anim", "fs-run", 5, 11, -1);
-    mk("fs-jump-anim", "fs-jump", 3, 8, 0);
-    mk("fs-look-anim", "fs-look", 3, 4, 0);
-    mk("fs-hurt-anim", "fs-hurt", 3, 8, 0);
-    mk("fs-dist-anim", "fs-distorted", 3, 5, -1);
-    mk("bfly-anim", "butterflies", 3, 8, -1);
+
+    const animationsOk = [
+      mk("fs-idle-anim", "fs-idle", 3, 5, -1),
+      mk("fs-run-anim", "fs-run", 5, 11, -1),
+      mk("fs-jump-anim", "fs-jump", 3, 8, 0),
+      mk("fs-look-anim", "fs-look", 3, 4, 0),
+      mk("fs-hurt-anim", "fs-hurt", 3, 8, 0),
+      mk("fs-dist-anim", "fs-distorted", 3, 5, -1),
+      mk("bfly-anim", "butterflies", 3, 8, -1),
+    ].every(Boolean);
+
+    if (!animationsOk) return;
+
     bridge.emit({ type: "loaded" });
     const level = (this.registry.get("startLevel") as number) || 1;
     this.scene.start("play", { level });
