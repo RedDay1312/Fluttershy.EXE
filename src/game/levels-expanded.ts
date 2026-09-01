@@ -27,8 +27,7 @@ function clonePickups(items: Pickup[], offset: number, level: number, pass: numb
   return items.map((p, i) => ({ ...p, x: p.x + offset, id: `${p.id}-echo-${level}-${pass}-${i}` }));
 }
 
-// Extra non-solid set dressing. It uses the sprites already shipped with the game,
-// so the levels become much less repetitive without requiring new PNGs yet.
+// Extra set dressing, including the new horror sprites.
 function atmosphericDecor(level: LevelDef, offset: number, pass: number): Decor[] {
   const w = level.width;
   const out: Decor[] = [];
@@ -38,35 +37,63 @@ function atmosphericDecor(level: LevelDef, offset: number, pass: number): Decor[
     out.push({ x: offset + x, y, sprite, scale, depth, alpha, ...extra });
   };
 
-  // Big landmarks interrupt the repeating tree silhouettes.
+  // Early levels stay mostly natural; the new sprites are introduced gradually.
   for (let x = 280; x < w - 180; x += 760) {
-    if (level.id <= 2 && pass === 1) {
+    if (level.id === 1 && pass === 1) {
       add(x, 628, x % 1520 < 760 ? "cottage" : "sign", x % 1520 < 760 ? 0.34 : 0.75, 5, 0.82);
+    } else if (level.id === 2) {
+      add(x, 628, x % 1520 < 760 ? "rock" : "mushroom", x % 1520 < 760 ? 0.72 : 0.58, 6, 0.7);
+      if (pass >= 2) add(x + 130, 548, "eyes", 0.48, 9, 0.3, { follow: true, sway: true });
     } else if (level.id === 3) {
-      add(x, 628, x % 1520 < 760 ? "poster" : "rock", x % 1520 < 760 ? 0.52 : 0.75, 5, 0.78);
-      add(x + 150, 620, "mushroom", 0.62, 7, 0.7);
+      add(x, 628, x % 1520 < 760 ? "rock" : "mushroom", x % 1520 < 760 ? 0.75 : 0.62, 6, 0.72);
+      add(x + 170, 560, "eyes", 0.48, 9, 0.38, { follow: true, sway: true });
+    } else if (level.id === 4) {
+      add(x, 600, "eyes", 0.58, 9, 0.48, { follow: true, sway: true });
     } else if (corrupted) {
       add(x, 600, severe ? "fs-distorted" : "eyes", severe ? 0.52 : 0.7, 6, severe ? 0.16 : 0.5, severe ? { sway: true } : { follow: true, sway: true });
     }
   }
 
-  // Ground clutter uses irregular spacing so the world does not look tiled.
   const clutterStep = level.id <= 2 ? 315 : level.id === 3 ? 260 : 390;
   for (let i = 0, x = 145; x < w - 120; i++, x += clutterStep) {
     const y = 625 + ((i * 37 + pass * 19) % 13);
     if (level.id === 1) {
       if (i % 3 === 0) add(x, y, "rock", 0.42 + (i % 2) * 0.12, 6, 0.72);
       if (i % 4 === 1) add(x + 48, y, "mushroom", 0.48, 7, 0.72, { sway: true });
+      if (pass >= 3 && i % 7 === 2) add(x + 80, 520, "eyes", 0.38, 9, 0.24, { follow: true, sway: true });
     } else if (level.id === 2) {
       if (i % 3 === 0) add(x, y, "rock", 0.5, 6, 0.55);
       if (i % 4 === 2) add(x + 28, y - 8, "eyes", 0.42, 9, 0.28, { follow: true, sway: true });
+      if (pass >= 2 && i % 6 === 3) add(x + 60, 520, "dead-tree", 0.3, 3, 0.34);
     } else if (level.id === 3) {
       if (i % 3 === 0) add(x, y, "rock", 0.52, 6, 0.62);
       if (i % 4 === 0) add(x + 35, y, "mushroom", 0.44, 7, 0.58);
       if (i % 5 === 2) add(x + 75, 585, "eyes", 0.46, 9, 0.34, { follow: true, sway: true });
+      if (i % 7 === 4) add(x + 110, 530, "skull", 0.28, 7, 0.72);
     } else {
       if (i % 2 === 0) add(x, y - 20, "eyes", severe ? 0.5 : 0.42, 9, severe ? 0.42 : 0.26, { follow: true, sway: true });
       if (i % 5 === 1) add(x + 70, 610, "poster", 0.36, 6, severe ? 0.3 : 0.46, { flip: i % 2 === 0 });
+    }
+  }
+
+  // Hanging ponies are introduced as background discoveries from the blood stage onward.
+  if (level.id >= 3) {
+    const hanging = ["hang-orange", "hang-pink", "hang-purple", "hang-yellow"];
+    const count = level.id === 3 ? 2 : level.id === 4 ? 3 : 4;
+    for (let i = 0; i < count; i++) {
+      const x = 560 + ((i * 977 + level.id * 313 + pass * 181) % Math.max(600, w - 900));
+      const y = 210 + ((i * 67 + pass * 29) % 110);
+      const sprite = hanging[(i + level.id + pass) % hanging.length];
+      const alpha = level.id === 3 ? 0.48 : level.id === 4 ? 0.62 : Math.min(0.78, 0.48 + pass * 0.08);
+      add(x, y, sprite, level.id >= 5 ? 0.72 : 0.62, 4, alpha, { sway: true });
+    }
+  }
+
+  if (level.id >= 3) {
+    const skullCount = level.id === 3 ? 2 : level.id === 4 ? 4 : 6;
+    for (let i = 0; i < skullCount; i++) {
+      const x = 390 + ((i * 811 + pass * 143) % Math.max(500, w - 700));
+      add(x, 608, "skull", 0.25 + (i % 2) * 0.06, 7, level.id === 3 ? 0.62 : 0.78);
     }
   }
 
