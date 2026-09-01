@@ -6,12 +6,11 @@ import "./horror-director";
 export function createWaitingGame(parent: HTMLElement, startLevel = 1): Phaser.Game {
   const level = Number.isFinite(startLevel) ? Math.max(1, Math.min(7, Math.floor(startLevel))) : 1;
 
-  // Keep manual scene registration: it lets us put the requested level in the
-  // registry before PreloadScene starts. The previous code already used this
-  // pattern; the important part is that every failure is surfaced instead of
-  // leaving a silent black canvas.
+  // Canvas avoids browser/GPU-specific WebGL context failures. The game is a
+  // 2D platformer, so the Canvas renderer is sufficient and much easier to
+  // diagnose on machines where Phaser.AUTO can produce a black canvas.
   const game = new Phaser.Game({
-    type: Phaser.AUTO,
+    type: Phaser.CANVAS,
     parent,
     width: 1280,
     height: 720,
@@ -30,9 +29,7 @@ export function createWaitingGame(parent: HTMLElement, startLevel = 1): Phaser.G
     },
     render: {
       antialias: false,
-      antialiasGL: false,
       roundPixels: true,
-      powerPreference: "high-performance",
       batchSize: 2048,
       maxLights: 0,
       clearBeforeRender: true,
@@ -43,12 +40,9 @@ export function createWaitingGame(parent: HTMLElement, startLevel = 1): Phaser.G
   });
 
   game.registry.set("startLevel", level);
-  game.registry.set("startupError", "");
 
   game.events.on("error", (error: unknown) => {
-    const message = error instanceof Error ? error.message : String(error);
     console.error("[Fluttershy.EXE] Phaser error:", error);
-    game.registry.set("startupError", message);
   });
 
   game.scene.add("preload", PreloadScene, false);
