@@ -145,25 +145,108 @@ function screamerBurst() {
   window.setTimeout(()=>{face.style.opacity="0";flash.style.opacity=".82";},230); window.setTimeout(()=>{horrorBusy=false;},1100);
 }
 
+function instantPonyFlash() {
+  if(typeof document==="undefined" || horrorBusy || loreNoteOpen)return;
+  horrorBusy=true;
+  const layer=horrorLayer(760); if(!layer){horrorBusy=false;return;}
+  const flash=document.createElement("div");
+  Object.assign(flash.style,{position:"absolute",inset:"0",background:"rgba(255,255,255,.92)",opacity:"0",transition:"opacity 35ms linear"});
+  const pony=document.createElement("div");
+  Object.assign(pony.style,{position:"absolute",left:`${35+Math.random()*30}%`,top:`${25+Math.random()*42}%`,width:"min(55vw,560px)",height:"min(68vh,680px)",transform:`translate(-50%,-50%) scale(${.82+Math.random()*.28}) rotate(${(Math.random()-.5)*7}deg)`,backgroundImage:"url('/sprites/fs-horror.png')",backgroundPosition:"center",backgroundRepeat:"no-repeat",backgroundSize:"contain",filter:"contrast(1.55) brightness(.45) saturate(.25) drop-shadow(0 0 28px rgba(0,0,0,.95))",opacity:"0",transition:"opacity 28ms linear, transform 70ms cubic-bezier(.05,.95,.2,1)"});
+  layer.append(flash,pony);
+  requestAnimationFrame(()=>{flash.style.opacity=".72";pony.style.opacity="1";pony.style.transform=`translate(-50%,-50%) scale(${1.05+Math.random()*.2}) rotate(${(Math.random()-.5)*8}deg)`;});
+  playHorrorSfx("snap");
+  window.setTimeout(()=>{flash.style.opacity="0";pony.style.opacity="0";},105);
+  window.setTimeout(()=>{horrorBusy=false;},760);
+}
+
+function blackoutAmbush() {
+  if(typeof document==="undefined" || horrorBusy || loreNoteOpen)return;
+  horrorBusy=true;
+  const layer=horrorLayer(1450); if(!layer){horrorBusy=false;return;}
+  const black=document.createElement("div");
+  Object.assign(black.style,{position:"absolute",inset:"0",background:"#000",opacity:"0",transition:"opacity 55ms linear"});
+  const whisper=document.createElement("div");
+  Object.assign(whisper.style,{position:"absolute",left:"50%",top:"50%",transform:"translate(-50%,-50%)",fontFamily:"Georgia, serif",fontSize:"clamp(20px,3vw,38px)",letterSpacing:".18em",color:"rgba(255,255,255,.82)",textShadow:"0 0 18px rgba(255,255,255,.25)",opacity:"0",whiteSpace:"nowrap"});
+  whisper.textContent=Math.random()<.5?"НЕ ОБОРАЧИВАЙСЯ":"Я ВИЖУ ТЕБЯ";
+  layer.append(black,whisper);
+  requestAnimationFrame(()=>{black.style.opacity=".94";});
+  window.setTimeout(()=>{whisper.style.opacity="1";},260);
+  window.setTimeout(()=>{whisper.style.opacity="0";black.style.opacity="0";},520);
+  window.setTimeout(()=>{ if(Math.random()<.7) instantPonyFlash(); },650);
+  playHorrorSfx("breath");
+  window.setTimeout(()=>{horrorBusy=false;},1450);
+}
+
+function blinkAmbush() {
+  if(typeof document==="undefined" || horrorBusy || loreNoteOpen)return;
+  horrorBusy=true;
+  const layer=horrorLayer(500); if(!layer){horrorBusy=false;return;}
+  const lid=document.createElement("div");
+  Object.assign(lid.style,{position:"absolute",inset:"0",background:"#000",opacity:"0",transition:"opacity 28ms linear"});
+  layer.appendChild(lid);
+  requestAnimationFrame(()=>{lid.style.opacity="1";});
+  window.setTimeout(()=>{lid.style.opacity="0";},75);
+  window.setTimeout(()=>{if(Math.random()<.55)instantPonyFlash();},125);
+  window.setTimeout(()=>{horrorBusy=false;},500);
+}
+
+function closeBehindFlash() {
+  if(typeof document==="undefined" || horrorBusy || loreNoteOpen)return;
+  horrorBusy=true;
+  const layer=horrorLayer(620); if(!layer){horrorBusy=false;return;}
+  const shadow=document.createElement("div");
+  Object.assign(shadow.style,{position:"absolute",left:`${10+Math.random()*80}%`,top:`${18+Math.random()*55}%`,width:"130px",height:"260px",transform:"translate(-50%,-50%) scaleY(.1)",background:"radial-gradient(ellipse at 50% 40%, rgba(0,0,0,.96) 0 42%, transparent 72%)",filter:"blur(1px) drop-shadow(0 0 20px rgba(0,0,0,.9))",opacity:"0",transition:"opacity 22ms linear, transform 95ms cubic-bezier(.08,.9,.2,1)"});
+  layer.appendChild(shadow);
+  requestAnimationFrame(()=>{shadow.style.opacity="1";shadow.style.transform="translate(-50%,-50%) scaleY(1)";});
+  playHorrorSfx("steps");
+  window.setTimeout(()=>{shadow.style.opacity="0";},155);
+  window.setTimeout(()=>{horrorBusy=false;},620);
+}
+
 function deathBurst(){const layer=horrorLayer(420);if(!layer)return;Object.assign(layer.style,{background:"radial-gradient(circle at 50% 50%, rgba(255,255,255,.35), rgba(95,0,0,.45) 30%, rgba(0,0,0,.94) 85%)",mixBlendMode:"normal"});}
 function shakeScreen(){if(typeof document==="undefined")return;document.body.animate([{transform:"translate(0,0)"},{transform:"translate(-7px,2px)"},{transform:"translate(5px,-3px)"},{transform:"translate(-3px,1px)"},{transform:"translate(0,0)"}],{duration:230,easing:"steps(4,end)"});}
 
+function surpriseEvent(level: number) {
+  if(typeof document==="undefined" || horrorBusy || loreNoteOpen)return;
+  const roll=Math.random();
+  if(level<=2){
+    if(roll<.42)closeBehindFlash();
+    else if(roll<.78)blinkAmbush();
+    else instantPonyFlash();
+    return;
+  }
+  if(level<=4){
+    if(roll<.25)closeBehindFlash();
+    else if(roll<.48)blackoutAmbush();
+    else if(roll<.72)instantPonyFlash();
+    else blinkAmbush();
+    return;
+  }
+  if(roll<.2)blackoutAmbush();
+  else if(roll<.43)instantPonyFlash();
+  else if(roll<.63)screamerBurst();
+  else if(roll<.82)closeBehindFlash();
+  else blinkAmbush();
+}
+
 function organicEvent(level: number) {
-  if(typeof document==="undefined" || horrorBusy || loreNoteOpen) return;
+  if(typeof document === "undefined" || horrorBusy || loreNoteOpen) return;
   const now=Date.now();
-  const cooldown=level<=2?17000:level<=4?12500:9500;
+  const cooldown=level<=2?15500:level<=4?11000:8500;
   if(now-lastOrganicHorror<cooldown)return;
-  const chance=level<=2?.32:level<=4?.5:.68;
+  const chance=level<=2?.42:level<=4?.58:.72;
   if(Math.random()>chance)return;
   lastOrganicHorror=now;
   const roll=Math.random();
-  if(roll<.24){playHorrorSfx("knock");return;}
-  if(roll<.43){playHorrorSfx("rustle");return;}
-  if(roll<.62){playHorrorSfx("steps");return;}
-  if(roll<.78){playHorrorSfx("breath");return;}
-  if(roll<.9){playHorrorSfx("snap");return;}
+  if(roll<.18){playHorrorSfx("knock");return;}
+  if(roll<.32){playHorrorSfx("rustle");return;}
+  if(roll<.45){playHorrorSfx("steps");return;}
+  if(roll<.57){playHorrorSfx("breath");return;}
+  if(roll<.66){playHorrorSfx("snap");return;}
+  if(roll<.83){surpriseEvent(level);return;}
   playHorrorSfx("drone");
-  if(level>=5 && Math.random()<.22) window.setTimeout(screamerBurst,700);
+  if(level>=5 && Math.random()<.28) window.setTimeout(screamerBurst,500+Math.random()*900);
 }
 
 export const bridge={
@@ -173,12 +256,12 @@ export const bridge={
     if(e.type==="note") showLoreNote(e.id);
     if(e.type==="whisper"){
       const roll=Math.random();
-      if(roll<.11) screamerBurst(); else if(roll<.58) spawnWatcher(); else playHorrorSfx("breath");
+      if(roll<.08) screamerBurst(); else if(roll<.32) surpriseEvent(5); else if(roll<.68) spawnWatcher(); else playHorrorSfx("breath");
     } else if(e.type==="died") { deathBurst(); }
     else if(e.type==="shake-window") { shakeScreen(); playHorrorSfx("snap"); }
-    else if(e.type==="overlay"&&e.kind==="glitch") { glitchBurst(); if(Math.random()<.06) window.setTimeout(screamerBurst,180+Math.random()*260); }
-    else if(e.type==="overlay"&&e.kind==="stare") { if(Math.random()<.18)screamerBurst(); else {stareBurst();playSfx("stare");} }
-    else if(e.type==="overlay"&&e.kind==="black") { const roll=Math.random(); if(roll<.08)window.setTimeout(screamerBurst,Math.min(700,e.ms??700)); else if(roll<.36)window.setTimeout(spawnWatcher,Math.min(900,e.ms??900)); }
+    else if(e.type==="overlay"&&e.kind==="glitch") { glitchBurst(); if(Math.random()<.1) window.setTimeout(()=>surpriseEvent(5),90+Math.random()*280); }
+    else if(e.type==="overlay"&&e.kind==="stare") { if(Math.random()<.28)screamerBurst(); else {stareBurst();playSfx("stare");} }
+    else if(e.type==="overlay"&&e.kind==="black") { const roll=Math.random(); if(roll<.12)window.setTimeout(screamerBurst,Math.min(650,e.ms??650)); else if(roll<.42)window.setTimeout(()=>surpriseEvent(5),Math.min(700,e.ms??700)); }
     handlers.forEach(h=>h(e));
   },
   on(h:Handler){handlers.add(h);return()=>{handlers.delete(h);};},
