@@ -1,5 +1,6 @@
 import { setStoryFlag, advanceStory, type StoryFlag } from "./story-state";
 import { bridge } from "./bridge";
+import { playHorrorSfx, hushMusic } from "./audio";
 import "./horror-cutscenes";
 import "./player-address";
 
@@ -14,11 +15,23 @@ const BEATS:HorrorBeat[]=[
 {level:7,fear:7,event:"black",ms:3000,flag:"final_break"},
 ];
 let last=-1;
+
+function escalationSound(level:number) {
+  if (level <= 1) { playHorrorSfx("rustle"); return; }
+  if (level === 2) { playHorrorSfx("knock"); playHorrorSfx("steps"); return; }
+  if (level === 3) { playHorrorSfx("breath"); playHorrorSfx("heartbeat"); return; }
+  if (level === 4) { hushMusic(1.2); playHorrorSfx("impact"); playHorrorSfx("heartbeat"); return; }
+  if (level === 5) { hushMusic(1.8); playHorrorSfx("breath"); playHorrorSfx("heartbeat"); return; }
+  if (level === 6) { hushMusic(2.4); playHorrorSfx("impact"); playHorrorSfx("scream"); playHorrorSfx("heartbeat"); return; }
+  hushMusic(3); playHorrorSfx("scream"); playHorrorSfx("impact"); playHorrorSfx("heartbeat");
+}
+
 bridge.on(e=>{
  if(e.type!=="level-clear"||e.level===last)return;
  last=e.level;
  const b=BEATS.find(x=>x.level===e.level);if(!b)return;
  advanceStory(e.level,b.fear);if(b.flag)setStoryFlag(b.flag);
+ escalationSound(e.level);
  window.setTimeout(()=>{
   if(b.event==="black")bridge.emit({type:"overlay",kind:"black",textKey:"black.2",ms:b.ms});
   else if(b.event==="stare")bridge.emit({type:"overlay",kind:"stare",ms:b.ms});
