@@ -1,3 +1,5 @@
+import { playSfx } from "./audio";
+
 export type OverlayKind =
   | "none"
   | "bsod"
@@ -37,6 +39,7 @@ const handlers = new Set<Handler>();
 
 export const bridge = {
   emit(e: BridgeEvent) {
+    if (e.type === "checkpoint") playSfx("checkpoint");
     handlers.forEach((h) => h(e));
   },
   on(h: Handler) {
