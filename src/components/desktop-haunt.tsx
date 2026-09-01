@@ -34,7 +34,7 @@ const DECOY_RESULTS=[
  {host:"help.cottage",title:"Справка",body:"Если вы попали сюда случайно, закройте окно. Если вы искали это намеренно — вы уже видели подсказку."},
 ];
 function normalizeSearch(v:string){return v.trim().toLocaleLowerCase().replace(/ё/g,"е").replace(/[^a-zа-я0-9]+/gi," ").trim();}
-function BrowserWindow(){
+export function BrowserWindow(){
  const s=useGameStore();
  const [query,setQuery]=useState("");
  const [submitted,setSubmitted]=useState("");
