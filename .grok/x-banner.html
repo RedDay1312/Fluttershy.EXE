@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <style>
+    @font-face {
+      font-family: CoverSerif;
+      src: url("CoverSerif.ttf") format("truetype");
+      font-weight: 700;
+    }
+    html, body {
+      margin: 0;
+      width: 1200px;
+      height: 264px;
+      overflow: hidden;
+      background: #07070A;
+    }
+    .stage {
+      position: relative;
+      width: 1200px;
+      height: 264px;
+    }
+    .title {
+      position: absolute;
+      left: 48px;
+      top: 38px;
+      margin: 0;
+      padding: 0;
+      font-family: CoverSerif, "Liberation Serif", Georgia, serif;
+      font-weight: 700;
+      font-size: 72px;
+      letter-spacing: 0.16em;
+      color: #F3E8D8;
+      text-shadow:
+        0 1px 0 #1A3A32,
+        0 3px 0 #7A1218,
+        0 8px 22px rgba(7, 7, 10, 0.85);
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .scan {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(7, 7, 10, 0) 0px,
+        rgba(7, 7, 10, 0) 3px,
+        rgba(94, 196, 200, 0.05) 3px,
+        rgba(94, 196, 200, 0.05) 4px
+      );
+      mix-blend-mode: screen;
+      pointer-events: none;
+      z-index: 6;
+    }
+    .vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 72% 40%, rgba(7,7,10,0) 20%, rgba(7,7,10,0.35) 70%, rgba(7,7,10,0.72) 100%);
+      pointer-events: none;
+      z-index: 4;
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <svg viewBox="0 0 1200 264" width="1200" height="264" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#07070A"/>
+          <stop offset="45%" stop-color="#0C1614"/>
+          <stop offset="100%" stop-color="#1A3A32"/>
+        </linearGradient>
+        <radialGradient id="bloodMoon" cx="88%" cy="20%" r="30%">
+          <stop offset="0%" stop-color="#7A1218" stop-opacity="0.8"/>
+          <stop offset="40%" stop-color="#7A1218" stop-opacity="0.22"/>
+          <stop offset="100%" stop-color="#7A1218" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="monitorWash" cx="78%" cy="40%" r="32%">
+          <stop offset="0%" stop-color="#5EC4C8" stop-opacity="0.28"/>
+          <stop offset="60%" stop-color="#5EC4C8" stop-opacity="0.06"/>
+          <stop offset="100%" stop-color="#5EC4C8" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="eyeHalo" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#5EC4C8" stop-opacity="0.95"/>
+          <stop offset="40%" stop-color="#5EC4C8" stop-opacity="0.45"/>
+          <stop offset="100%" stop-color="#5EC4C8" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="bodyShade" cx="38%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#F8E4A8"/>
+          <stop offset="55%" stop-color="#F4D27A"/>
+          <stop offset="100%" stop-color="#C9A24E"/>
+        </radialGradient>
+        <radialGradient id="headShade" cx="40%" cy="32%" r="70%">
+          <stop offset="0%" stop-color="#F8E4A8"/>
+          <stop offset="60%" stop-color="#F4D27A"/>
+          <stop offset="100%" stop-color="#D4B05A"/>
+        </radialGradient>
+        <radialGradient id="maneGrad" cx="40%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#F3C4D4"/>
+          <stop offset="55%" stop-color="#E89BB8"/>
+          <stop offset="100%" stop-color="#C56E91"/>
+        </radialGradient>
+        <filter id="glowTeal" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="6" result="b"/>
+          <feMerge>
+            <feMergeNode in="b"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <filter id="fogBlur">
+          <feGaussianBlur stdDeviation="12"/>
+        </filter>
+      </defs>
+
+      <rect width="1200" height="264" fill="url(#sky)"/>
+      <rect width="1200" height="264" fill="url(#bloodMoon)"/>
+      <rect width="1200" height="264" fill="url(#monitorWash)"/>
+
+      <g fill="#10241F">
+        <path d="M0 120 L50 70 L90 110 L140 50 L200 100 L260 40 L330 95 L400 35 L480 100 L560 45 L640 90 L720 30 L800 85 L880 40 L960 95 L1040 35 L1120 90 L1200 50 L1200 264 L0 264 Z"/>
+      </g>
+      <g fill="#0E1E1A">
+        <path d="M0 150 L40 90 L80 130 L130 70 L190 125 L250 60 L320 120 L400 55 L490 125 L580 65 L670 120 L760 50 L850 115 L940 60 L1030 125 L1120 70 L1200 120 L1200 264 L0 264 Z"/>
+      </g>
+
+      <g fill="#081410">
+        <g transform="translate(40,200) scale(0.72)">
+          <rect x="-8" y="0" width="16" height="90"/>
+          <polygon points="0,-180 -50,-20 50,-20"/>
+          <polygon points="0,-110 -64,40 64,40"/>
+          <polygon points="0,-40 -76,90 76,90"/>
+        </g>
+        <g transform="translate(118,210) scale(0.55)">
+          <rect x="-7" y="0" width="14" height="70"/>
+          <polygon points="0,-150 -42,-10 42,-10"/>
+          <polygon points="0,-80 -54,40 54,40"/>
+        </g>
+        <g transform="translate(1128,190) scale(0.8)">
+          <rect x="-8" y="0" width="16" height="90"/>
+          <polygon points="0,-190 -52,-20 52,-20"/>
+          <polygon points="0,-110 -68,40 68,40"/>
+          <polygon points="0,-40 -80,90 80,90"/>
+        </g>
+      </g>
+
+      <g filter="url(#fogBlur)" opacity="0.22" fill="#F3E8D8">
+        <ellipse cx="500" cy="230" rx="380" ry="40"/>
+      </g>
+
+      <!-- pony on the right, looking at camera; may sit in overlay strip -->
+      <g id="pony" transform="translate(930, 150) scale(0.92)">
+        <g fill="url(#maneGrad)">
+          <ellipse cx="-108" cy="78" rx="46" ry="20" transform="rotate(-28 -108 78)"/>
+          <ellipse cx="-138" cy="58" rx="34" ry="16" transform="rotate(-48 -138 58)"/>
+        </g>
+        <g fill="#E0C36A">
+          <ellipse cx="78" cy="42" rx="58" ry="20" transform="rotate(28 78 42)"/>
+          <ellipse cx="108" cy="28" rx="28" ry="12" transform="rotate(38 108 28)"/>
+        </g>
+        <ellipse cx="4" cy="78" rx="68" ry="52" fill="url(#bodyShade)"/>
+        <g fill="#F4D27A">
+          <ellipse cx="-62" cy="48" rx="54" ry="18" transform="rotate(-24 -62 48)"/>
+          <ellipse cx="-92" cy="36" rx="26" ry="11" transform="rotate(-34 -92 36)"/>
+        </g>
+        <g fill="#E8C56A">
+          <rect x="-38" y="110" width="16" height="40" rx="8"/>
+          <rect x="-8" y="114" width="15" height="38" rx="8"/>
+          <rect x="22" y="112" width="15" height="40" rx="8"/>
+          <rect x="48" y="110" width="16" height="42" rx="8"/>
+        </g>
+        <ellipse cx="6" cy="18" rx="28" ry="32" fill="url(#headShade)"/>
+        <g>
+          <ellipse cx="-28" cy="-92" rx="14" ry="26" fill="#F4D27A" transform="rotate(-18 -28 -92)"/>
+          <ellipse cx="38" cy="-94" rx="14" ry="26" fill="#F4D27A" transform="rotate(16 38 -94)"/>
+          <ellipse cx="-28" cy="-90" rx="7" ry="14" fill="#E89BB8" transform="rotate(-18 -28 -90)"/>
+          <ellipse cx="38" cy="-92" rx="7" ry="14" fill="#E89BB8" transform="rotate(16 38 -92)"/>
+        </g>
+        <ellipse cx="6" cy="-52" rx="58" ry="54" fill="url(#headShade)"/>
+        <ellipse cx="8" cy="-28" rx="36" ry="26" fill="#F8E0A0"/>
+        <g fill="url(#maneGrad)">
+          <ellipse cx="-8" cy="-96" rx="36" ry="18" transform="rotate(-8 -8 -96)"/>
+          <ellipse cx="-48" cy="-70" rx="28" ry="16" transform="rotate(-40 -48 -70)"/>
+          <path d="M-20 -100 C-70 -90 -86 -20 -74 20 C-50 -10 -20 -40 -8 -70 Z"/>
+          <path d="M20 -108 C70 -88 74 -20 58 18 C40 -20 18 -50 10 -78 Z"/>
+        </g>
+        <g transform="translate(44,-108) rotate(18)">
+          <ellipse cx="-16" cy="0" rx="16" ry="11" fill="#E89BB8"/>
+          <ellipse cx="16" cy="0" rx="16" ry="11" fill="#E89BB8"/>
+          <ellipse cx="0" cy="0" rx="7" ry="7" fill="#C56E91"/>
+          <path d="M-4 6 L-10 22 L0 10 L10 22 L4 6 Z" fill="#E89BB8"/>
+        </g>
+        <g transform="translate(-18,-54)">
+          <ellipse cx="0" cy="0" rx="13" ry="16" fill="#F3E8D8"/>
+          <ellipse cx="1" cy="1" rx="9" ry="12" fill="#1A3A32"/>
+          <ellipse cx="2" cy="-1" rx="4" ry="5" fill="#0A1412"/>
+          <circle cx="4" cy="-4" r="2.2" fill="#F3E8D8" opacity="0.7"/>
+        </g>
+        <g transform="translate(32,-56)">
+          <circle cx="0" cy="0" r="26" fill="url(#eyeHalo)"/>
+          <ellipse cx="0" cy="0" rx="14" ry="17" fill="#F3E8D8"/>
+          <ellipse cx="1" cy="1" rx="10" ry="13" fill="#5EC4C8" filter="url(#glowTeal)"/>
+          <ellipse cx="2" cy="0" rx="5" ry="7" fill="#0A1C1C"/>
+          <rect x="3" y="-7" width="5" height="5" fill="#F3E8D8" opacity="0.95"/>
+        </g>
+        <path d="M-6 -8 Q8 -1 22 -8" fill="none" stroke="#C56E91" stroke-width="2.2" stroke-linecap="round" opacity="0.85"/>
+      </g>
+    </svg>
+    <div class="vignette"></div>
+    <h1 class="title">WAITING</h1>
+    <div class="scan"></div>
+  </div>
+</body>
+</html>
