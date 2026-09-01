@@ -220,3 +220,196 @@
     transform: scaleX(-1);
   }
 }
+
+/* --- UI polish ---------------------------------------------------------- */
+
+/* Softer global interaction language: fewer harsh edges, clearer hover/focus. */
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* Main game window: make the frame feel like a deliberate application shell. */
+.os-desktop > .scanlines > .absolute.z-30 {
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow:
+    0 24px 70px rgb(0 0 0 / 0.48),
+    0 0 0 1px rgb(0 0 0 / 0.35);
+  backdrop-filter: blur(3px);
+}
+
+.os-titlebar {
+  min-height: 34px;
+  padding: 5px 7px;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.18) inset, 0 2px 8px rgb(0 0 0 / 0.22);
+}
+
+.os-titlebar > span {
+  font-weight: 600;
+  letter-spacing: 0.015em;
+}
+
+.os-titlebar button {
+  min-width: 28px;
+  min-height: 24px;
+  border: 1px solid rgb(0 0 0 / 0.22);
+  border-radius: 4px;
+  box-shadow: 1px 1px 0 rgb(255 255 255 / 0.65) inset;
+  transition: transform 120ms ease, filter 120ms ease;
+}
+
+.os-titlebar button:hover {
+  filter: brightness(1.06);
+}
+
+.os-titlebar button:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+/* Title screen: more breathing room and a subtle glass layer over the game. */
+.os-desktop .z-40.flex.flex-col.items-center.justify-center {
+  background:
+    radial-gradient(circle at 50% 40%, rgb(126 200 201 / 0.08), transparent 34%),
+    linear-gradient(180deg, rgb(7 7 10 / 0.78), rgb(7 7 10 / 0.94));
+  backdrop-filter: blur(6px);
+}
+
+.os-desktop .z-40.flex.flex-col.items-center.justify-center > img {
+  filter: drop-shadow(0 16px 30px rgb(0 0 0 / 0.45));
+  transition: transform 260ms ease, filter 260ms ease;
+}
+
+.os-desktop .z-40.flex.flex-col.items-center.justify-center > img:hover {
+  transform: translateY(-3px) scale(1.025);
+  filter: drop-shadow(0 20px 34px rgb(0 0 0 / 0.55));
+}
+
+.os-desktop .z-40.flex.flex-col.items-center.justify-center h1 {
+  text-shadow: 0 4px 24px rgb(0 0 0 / 0.55);
+}
+
+/* Menu buttons: consistent height, depth and a pleasant hover state. */
+.os-desktop .z-40 button.rounded-md.border {
+  min-height: 44px;
+  border-color: rgb(239 230 214 / 0.14);
+  background: linear-gradient(180deg, rgb(31 35 43 / 0.96), rgb(22 25 31 / 0.96));
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.16), 0 1px 0 rgb(255 255 255 / 0.06) inset;
+  transition: transform 140ms ease, border-color 140ms ease, background 140ms ease, box-shadow 140ms ease;
+}
+
+.os-desktop .z-40 button.rounded-md.border:hover {
+  transform: translateY(-1px);
+  border-color: rgb(126 200 201 / 0.62);
+  background: linear-gradient(180deg, rgb(36 43 49 / 0.98), rgb(24 29 35 / 0.98));
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.24), 0 0 0 1px rgb(126 200 201 / 0.08) inset;
+}
+
+.os-desktop .z-40 button.rounded-md.border:active {
+  transform: translateY(1px);
+}
+
+/* Desktop icons: improve readability without losing the retro desktop feel. */
+.os-desktop .scanlines > .relative.z-10 > button {
+  min-height: 78px;
+  border-radius: 9px;
+  padding: 5px 4px;
+  transition: background 140ms ease, transform 140ms ease;
+}
+
+.os-desktop .scanlines > .relative.z-10 > button:hover {
+  background: rgb(255 255 255 / 0.10);
+}
+
+.os-desktop .scanlines > .relative.z-10 > button:active {
+  background: rgb(126 200 201 / 0.14);
+}
+
+/* HUD chips: compact but legible against bright and dark levels. */
+.os-desktop .pointer-events-none.absolute.left-3.top-3 span {
+  border: 1px solid rgb(239 230 214 / 0.10);
+  background: linear-gradient(135deg, rgb(7 7 10 / 0.72), rgb(18 20 26 / 0.64));
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.16);
+  backdrop-filter: blur(8px);
+}
+
+/* Dialogue: stronger hierarchy and a cleaner reading surface. */
+.os-desktop .absolute.inset-x-3.bottom-20,
+.os-desktop .absolute.inset-x-10.bottom-8 {
+  border-color: rgb(126 200 201 / 0.22);
+  background:
+    linear-gradient(135deg, rgb(18 20 26 / 0.97), rgb(13 15 20 / 0.94));
+  box-shadow:
+    0 18px 50px rgb(0 0 0 / 0.42),
+    0 0 0 1px rgb(255 255 255 / 0.035) inset;
+  backdrop-filter: blur(12px);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.os-desktop .absolute.inset-x-3.bottom-20:hover,
+.os-desktop .absolute.inset-x-10.bottom-8:hover {
+  border-color: rgb(126 200 201 / 0.36);
+}
+
+.os-desktop .absolute.inset-x-3.bottom-20 img,
+.os-desktop .absolute.inset-x-10.bottom-8 img {
+  filter: drop-shadow(0 8px 18px rgb(0 0 0 / 0.38));
+}
+
+/* Toasts should read as feedback, not another opaque rectangle. */
+.os-desktop .right-4.top-4 {
+  border-color: rgb(126 200 201 / 0.24);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.28);
+  backdrop-filter: blur(10px);
+}
+
+/* Pause overlay and journal panel. */
+.os-desktop .z-30.flex.items-center.justify-center.bg-bg\/70 {
+  background: rgb(4 5 8 / 0.70);
+  backdrop-filter: blur(7px);
+}
+
+.os-desktop .z-30.flex.items-center.justify-center.bg-bg\/70 > div {
+  border-color: rgb(126 200 201 / 0.20);
+  background: linear-gradient(145deg, rgb(22 25 31 / 0.98), rgb(14 16 21 / 0.98));
+  box-shadow: 0 24px 70px rgb(0 0 0 / 0.45), 0 1px 0 rgb(255 255 255 / 0.05) inset;
+  backdrop-filter: blur(14px);
+}
+
+/* Mobile controls: bigger hit areas and clearer separation from the scene. */
+.os-desktop .absolute.inset-x-0.bottom-0.z-10 > div > button {
+  border-color: rgb(239 230 214 / 0.16);
+  background: linear-gradient(180deg, rgb(18 20 26 / 0.78), rgb(8 9 12 / 0.88));
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.30), 0 1px 0 rgb(255 255 255 / 0.06) inset;
+  backdrop-filter: blur(8px);
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+}
+
+.os-desktop .absolute.inset-x-0.bottom-0.z-10 > div > button:active {
+  transform: scale(0.96);
+  background: rgb(126 200 201 / 0.20);
+  border-color: rgb(126 200 201 / 0.45);
+}
+
+/* Keep horror effects dominant: the polish disappears when the game intentionally breaks. */
+.is-corrupt .scanlines::after {
+  opacity: 0.72;
+}
+
+@media (max-width: 767px) {
+  .os-desktop .z-40.flex.flex-col.items-center.justify-center h1 {
+    font-size: 3.2rem;
+  }
+
+  .os-desktop .z-40.flex.flex-col.items-center.justify-center > img {
+    height: 7rem;
+    width: 7rem;
+  }
+}
