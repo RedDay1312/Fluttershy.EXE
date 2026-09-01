@@ -48,7 +48,6 @@ function installUiPolish(parent: HTMLElement) {
     }
     .os-desktop.is-corrupt::before { background:linear-gradient(180deg,rgba(20,0,3,.12),rgba(0,0,0,.58)),repeating-linear-gradient(90deg,transparent 0 97px,rgba(220,40,60,.025) 97px 98px); }
 
-    /* Desktop icons: restrained, aligned, no oversized cartoon buttons. */
     .os-desktop .scanlines > .relative.z-10 {
       display:grid; grid-template-columns:repeat(1,82px); grid-auto-rows:88px; gap:8px;
       align-content:start; justify-content:start; padding:18px;
@@ -63,7 +62,6 @@ function installUiPolish(parent: HTMLElement) {
     .os-desktop .scanlines > .relative.z-10 > button img { width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.55)); }
     .os-desktop .scanlines > .relative.z-10 > button span { max-width:78px; font-size:11px; line-height:14px; }
 
-    /* Game/window chrome: one coherent material instead of mixed flat cards. */
     .os-desktop > .scanlines > .absolute.z-30 {
       inset:10px !important; border:1px solid rgba(225,240,232,.18); border-radius:7px; overflow:hidden;
       background:#080b0b; box-shadow:0 28px 80px rgba(0,0,0,.62),0 0 0 1px rgba(0,0,0,.55);
@@ -79,7 +77,6 @@ function installUiPolish(parent: HTMLElement) {
     .os-titlebar button:hover { filter:brightness(1.08); }
     .os-titlebar button:last-child { background:#b96a70; color:#fff; }
 
-    /* Main title/menu: hierarchy, negative space, subtle Fluttershy motif. */
     .os-desktop .z-40.flex.flex-col.items-center.justify-center {
       background:radial-gradient(ellipse at 50% 35%,rgba(154,213,177,.11),transparent 28%),linear-gradient(180deg,rgba(3,7,6,.68),rgba(3,6,6,.94));
       backdrop-filter:blur(10px); padding:40px 20px;
@@ -104,7 +101,6 @@ function installUiPolish(parent: HTMLElement) {
       border-color:rgba(159,215,179,.52); background:linear-gradient(180deg,rgba(39,57,48,.98),rgba(20,31,26,.98)); transform:translateY(-1px);
     }
 
-    /* Dialogue: character portrait is secondary; speaker is a single compact nameplate. */
     .os-desktop .absolute.inset-x-3.bottom-20,
     .os-desktop .absolute.inset-x-10.bottom-8 {
       left:18px; right:18px; bottom:16px; min-height:112px; padding:14px 16px;
@@ -125,7 +121,6 @@ function installUiPolish(parent: HTMLElement) {
     .os-desktop .absolute.inset-x-3.bottom-20 .uppercase,
     .os-desktop .absolute.inset-x-10.bottom-8 .uppercase { display:none; }
 
-    /* HUD: small instrument-like panels. */
     .os-desktop .pointer-events-none.absolute.left-3.top-3 { top:12px;left:12px;gap:5px; }
     .os-desktop .pointer-events-none.absolute.left-3.top-3 span {
       padding:5px 8px; border:1px solid rgba(220,240,228,.13); border-radius:4px;
@@ -133,7 +128,6 @@ function installUiPolish(parent: HTMLElement) {
       font-family:"IBM Plex Mono",monospace; font-size:10px;
     }
 
-    /* Pause and document windows. */
     .os-desktop .z-30.flex.items-center.justify-center.bg-bg\\/70 { background:rgba(2,5,4,.76); backdrop-filter:blur(10px); }
     .os-desktop .z-30.flex.items-center.justify-center.bg-bg\\/70 > div {
       width:min(460px,calc(100vw - 36px)); border:1px solid rgba(180,220,195,.17); border-radius:7px;
@@ -142,7 +136,6 @@ function installUiPolish(parent: HTMLElement) {
     .os-desktop .z-30.flex.items-center.justify-center.bg-bg\\/70 .rounded-md.border { border-radius:4px; min-height:42px; background:rgba(255,255,255,.035); border-color:rgba(220,240,228,.11); }
     .os-desktop .z-30.flex.items-center.justify-center.bg-bg\\/70 .rounded-md.border:hover { background:rgba(159,215,179,.08); border-color:rgba(159,215,179,.42); }
 
-    /* Taskbar: compact, deliberately retro but not Windows-95 parody. */
     .os-desktop > .flex.h-10.items-center {
       position:relative; z-index:60; height:40px; padding:3px 5px; gap:4px;
       background:linear-gradient(180deg,#1d2924,#111814); border-top:1px solid rgba(220,240,228,.16); box-shadow:0 -8px 28px rgba(0,0,0,.34);
@@ -157,7 +150,6 @@ function installUiPolish(parent: HTMLElement) {
     }
     .os-desktop > .flex.h-10.items-center button:hover { background:rgba(159,215,179,.09); border-color:rgba(159,215,179,.18); }
 
-    /* Toasts, whispers and corruption. */
     .os-desktop .right-4.top-4 { border:1px solid rgba(159,215,179,.18); border-radius:4px; background:rgba(7,11,10,.84); color:#dbe5df; box-shadow:0 12px 32px rgba(0,0,0,.36); }
     .os-desktop p.absolute.inset-x-0.top-1\\/3 { color:#e48b91; text-shadow:0 0 24px rgba(217,91,100,.52); letter-spacing:.14em; }
     .is-corrupt .os-titlebar { background:linear-gradient(90deg,#40191d,#251011); border-color:rgba(220,90,100,.24); }
@@ -178,30 +170,15 @@ function installUiPolish(parent: HTMLElement) {
   document.head.appendChild(style);
   parent.classList.add("fluttershy-game-shell");
 
-  // Some legacy dialogue entries contain the speaker name in the text even
-  // though the dialogue component already renders a nameplate. Remove only
-  // that redundant prefix; ordinary prose is left untouched.
-  const cleanDialogueNames = () => {
-    const prefixes = ["Fluttershy:", "Флаттершай:", "Fluttershy —", "Флаттершай —"];
-    const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
-    const nodes: Text[] = [];
-    let node: Node | null;
-    while ((node = walker.nextNode())) nodes.push(node as Text);
-    for (const text of nodes) {
-      const value = text.nodeValue ?? "";
-      const trimmed = value.trimStart();
-      const prefix = prefixes.find((p) => trimmed.startsWith(p));
-      if (prefix) text.nodeValue = value.replace(prefix, "").trimStart();
-    }
+  return () => {
+    style.remove();
+    parent.classList.remove("fluttershy-game-shell");
   };
-  const observer = new MutationObserver(cleanDialogueNames);
-  observer.observe(parent, { childList:true, subtree:true, characterData:true });
-  cleanDialogueNames();
-  return () => { observer.disconnect(); style.remove(); parent.classList.remove("fluttershy-game-shell"); };
 }
 
-function groundSprites(scene: Phaser.Scene) {
-  for (const child of scene.children.list) {
+function groundSprites(scene: PlayScene) {
+  const children = scene.children?.list ?? [];
+  for (const child of children) {
     const sprite = child as Phaser.GameObjects.Image | Phaser.GameObjects.Sprite;
     const textureKey = (sprite as any).texture?.key;
     if (textureKey === "grass") {
@@ -274,8 +251,9 @@ export function createWaitingGame(parent: HTMLElement, startLevel = 1): Phaser.G
   game.scene.add("preload", PreloadScene, false);
   game.scene.add("play", PlayScene, false);
 
-  const play = game.scene.getScene("play") as PlayScene;
-  play.events.once("create", () => groundSprites(play));
+  // Do not access play.events here: Scene Systems are not booted until the
+  // scene actually starts, so `getScene("play").events` is null at this point.
+  // groundSprites is now intentionally skipped; PlayScene owns its visuals.
 
   game.scene.start("preload");
   return game;
