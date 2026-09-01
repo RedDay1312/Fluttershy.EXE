@@ -14,11 +14,64 @@ function showRuntimeError(parent: HTMLElement, error: unknown) {
   parent.appendChild(panel);
 }
 
+function installUiPolish(parent: HTMLElement) {
+  const style = document.createElement("style");
+  style.dataset.fluttershyPolish = "true";
+  style.textContent = `
+    .fluttershy-game-shell { position:relative; width:100%; height:100%; background:#050708; overflow:hidden; }
+    .fluttershy-game-shell canvas { image-rendering:auto; display:block; filter:saturate(.92) contrast(1.03); }
+    .fluttershy-game-shell [data-phaser-error] { text-shadow:0 0 12px rgba(255,70,90,.25); }
+    @media (max-width:900px) { .fluttershy-game-shell canvas { max-width:100%; max-height:100%; } }
+  `;
+  document.head.appendChild(style);
+  parent.classList.add("fluttershy-game-shell");
+
+  // Some legacy dialogue entries contain the speaker name in the text even
+  // though the dialogue component already renders a nameplate. Remove only
+  // that redundant prefix; ordinary prose is left untouched.
+  const cleanDialogueNames = () => {
+    const prefixes = ["Fluttershy:", "Флаттершай:", "Fluttershy —", "Флаттершай —"];
+    const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
+    const nodes: Text[] = [];
+    let node: Node | null;
+    while ((node = walker.nextNode())) nodes.push(node as Text);
+    for (const text of nodes) {
+      const value = text.nodeValue ?? "";
+      const trimmed = value.trimStart();
+      const prefix = prefixes.find((p) => trimmed.startsWith(p));
+      if (prefix) text.nodeValue = value.replace(prefix, "").trimStart();
+    }
+  };
+  const observer = new MutationObserver(cleanDialogueNames);
+  observer.observe(parent, { childList:true, subtree:true, characterData:true });
+  cleanDialogueNames();
+  return () => { observer.disconnect(); style.remove(); parent.classList.remove("fluttershy-game-shell"); };
+}
+
+function groundSprites(scene: Phaser.Scene) {
+  for (const child of scene.children.list) {
+    const sprite = child as Phaser.GameObjects.Image | Phaser.GameObjects.Sprite;
+    const textureKey = (sprite as any).texture?.key;
+    if (textureKey === "grass") {
+      sprite.y += 6;
+      sprite.setDepth(Math.max(sprite.depth, 8));
+      sprite.setScale(Math.min(sprite.scaleX || 1, 0.72), Math.min(sprite.scaleY || 1, 0.72));
+    }
+    if (textureKey === "bush") {
+      sprite.y += 3;
+      sprite.setDepth(Math.max(sprite.depth, 6));
+    }
+    if (textureKey?.startsWith("tree-")) {
+      sprite.y += 2;
+      sprite.setDepth(Math.max(sprite.depth, 3));
+    }
+  }
+}
+
 export function createWaitingGame(parent: HTMLElement, startLevel = 1): Phaser.Game {
   const level = Number.isFinite(startLevel) ? Math.max(1, Math.min(7, Math.floor(startLevel))) : 1;
+  const cleanupUi = installUiPolish(parent);
 
-  // Canvas avoids browser/GPU-specific WebGL context failures. This game is a
-  // 2D platformer, so Canvas is sufficient and more deterministic.
   const game = new Phaser.Game({
     type: Phaser.CANVAS,
     parent,
@@ -62,12 +115,16 @@ export function createWaitingGame(parent: HTMLElement, startLevel = 1): Phaser.G
   game.events.once("destroy", () => {
     window.removeEventListener("error", onError);
     window.removeEventListener("unhandledrejection", onRejection);
+    cleanupUi();
   });
   game.events.on("error", (error: unknown) => showRuntimeError(parent, error));
 
   game.scene.add("preload", PreloadScene, false);
   game.scene.add("play", PlayScene, false);
-  game.scene.start("preload");
 
+  const play = game.scene.getScene("play") as PlayScene;
+  play.events.once("create", () => groundSprites(play));
+
+  game.scene.start("preload");
   return game;
 }
