@@ -4,9 +4,8 @@ import { PreloadScene } from "./scenes/preload-scene";
 import "./horror-director";
 
 export function createWaitingGame(parent: HTMLElement, startLevel = 1): Phaser.Game {
-  // The desktop UI already provides the title/start screen. Avoid the extra
-  // Phaser Boot/Splash chain here: its fade can leave the embedded game black
-  // before gameplay is shown.
+  // Do not let Phaser auto-start the first scene before the registry contains
+  // the requested level. The React desktop owns the actual title screen.
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent,
@@ -36,9 +35,14 @@ export function createWaitingGame(parent: HTMLElement, startLevel = 1): Phaser.G
     },
     fps: { target: 60, forceSetTimeOut: false, smoothStep: true },
     audio: { disableWebAudio: true },
-    scene: [PreloadScene, PlayScene],
+    scene: [],
   });
 
-  game.registry.set("startLevel", Number.isFinite(startLevel) ? Math.max(1, Math.floor(startLevel)) : 1);
+  const level = Number.isFinite(startLevel) ? Math.max(1, Math.min(7, Math.floor(startLevel))) : 1;
+  game.registry.set("startLevel", level);
+  game.scene.add("preload", PreloadScene, false);
+  game.scene.add("play", PlayScene, false);
+  game.scene.start("preload");
+
   return game;
 }
