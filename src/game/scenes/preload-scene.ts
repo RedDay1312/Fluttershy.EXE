@@ -2,6 +2,10 @@ import * as Phaser from "phaser";
 import { bridge } from "../bridge";
 
 export class PreloadScene extends Phaser.Scene {
+  private loadErrors: string[] = [];
+  private status?: Phaser.GameObjects.Text;
+  private bar?: Phaser.GameObjects.Rectangle;
+
   constructor() { super("preload"); }
 
   preload() {
@@ -11,13 +15,22 @@ export class PreloadScene extends Phaser.Scene {
     this.add.text(w / 2, h / 2 - 48, "FLUTTERSHY.EXE", {
       fontFamily: "Cormorant Garamond, serif", fontSize: "48px", color: "#efe6d6"
     }).setOrigin(0.5);
-    this.add.text(w / 2, h / 2 - 8, "loading...", {
+    this.status = this.add.text(w / 2, h / 2 - 8, "loading...", {
       fontFamily: "IBM Plex Sans, sans-serif", fontSize: "14px", color: "#9a9388"
     }).setOrigin(0.5);
-    const barBg = this.add.rectangle(w / 2, h / 2 + 36, 420, 8, 0x2a2a32).setOrigin(0.5);
-    const bar = this.add.rectangle(w / 2 - 210, h / 2 + 36, 4, 8, 0x7ec8c9).setOrigin(0, 0.5);
-    void barBg;
-    this.load.on("progress", (v: number) => { bar.width = 420 * v; });
+    this.add.rectangle(w / 2, h / 2 + 36, 420, 8, 0x2a2a32).setOrigin(0.5);
+    this.bar = this.add.rectangle(w / 2 - 210, h / 2 + 36, 4, 8, 0x7ec8c9).setOrigin(0, 0.5);
+
+    this.load.on("progress", (v: number) => {
+      if (this.bar) this.bar.width = 420 * v;
+      if (this.status) this.status.setText(`loading... ${Math.round(v * 100)}%`);
+    });
+    this.load.on("loaderror", (file: Phaser.Loader.File) => {
+      const key = file.key || "unknown";
+      const url = file.src || "unknown";
+      this.loadErrors.push(`${key}: ${url}`);
+      console.error("[Fluttershy.EXE] Asset failed to load:", key, url);
+    });
 
     const sheets: [string, string, number, number][] = [
       ["fs-idle", "/sprites/fs-idle.png", 128, 128],
@@ -44,8 +57,19 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   create() {
+    if (this.loadErrors.length) {
+      const details = this.loadErrors.slice(0, 6).join("\n");
+      this.status?.setColor("#ff6b6b").setText(`asset error\n${details}`);
+      bridge.emit({ type: "game-error", message: `Asset loading failed:\n${details}` });
+      return;
+    }
+
     const mk = (key: string, tex: string, end: number, rate: number, repeat: number) => {
       if (this.anims.exists(key)) return;
+      const texture = this.textures.get(tex);
+      if (!texture || texture.key === "__MISSING") {
+        throw new Error(`Required texture missing: ${tex}`);
+      }
       this.anims.create({ key, frames: this.anims.generateFrameNumbers(tex, { start: 0, end }), frameRate: rate, repeat });
     };
     mk("fs-idle-anim", "fs-idle", 3, 5, -1);
