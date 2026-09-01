@@ -28,7 +28,6 @@ export function createWaitingGame(parent: HTMLElement, startLevel = 1): Phaser.G
       width: 1280,
       height: 720,
     },
-    // Avoid unnecessary texture smoothing work and prefer the GPU when available.
     render: {
       antialias: false,
       antialiasGL: false,
@@ -36,6 +35,12 @@ export function createWaitingGame(parent: HTMLElement, startLevel = 1): Phaser.G
       powerPreference: "high-performance",
       batchSize: 4096,
       maxLights: 0,
+      clearBeforeRender: true,
+    },
+    fps: {
+      target: 60,
+      forceSetTimeOut: false,
+      smoothStep: true,
     },
     audio: { disableWebAudio: true },
     scene: [BootScene, SplashScene, PreloadScene, PlayScene],
