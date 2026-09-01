@@ -3,12 +3,22 @@ import { PlayScene } from "./scenes/play-scene";
 import { PreloadScene } from "./scenes/preload-scene";
 import "./horror-director";
 
+function showRuntimeError(parent: HTMLElement, error: unknown) {
+  const message = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+  console.error("[Fluttershy.EXE] Runtime error:", error);
+  parent.querySelectorAll("[data-phaser-error]").forEach((node) => node.remove());
+  const panel = document.createElement("div");
+  panel.dataset.phaserError = "true";
+  panel.style.cssText = "position:absolute;inset:0;z-index:99999;background:#08080a;color:#ff8a8a;padding:32px;font:14px/1.5 monospace;white-space:pre-wrap;overflow:auto;pointer-events:auto";
+  panel.textContent = `FLUTTERSHY.EXE\n\nGAME STARTUP FAILED\n\n${message}\n\nOpen DevTools (F12) → Console for the full error.`;
+  parent.appendChild(panel);
+}
+
 export function createWaitingGame(parent: HTMLElement, startLevel = 1): Phaser.Game {
   const level = Number.isFinite(startLevel) ? Math.max(1, Math.min(7, Math.floor(startLevel))) : 1;
 
-  // Canvas avoids browser/GPU-specific WebGL context failures. The game is a
-  // 2D platformer, so the Canvas renderer is sufficient and much easier to
-  // diagnose on machines where Phaser.AUTO can produce a black canvas.
+  // Canvas avoids browser/GPU-specific WebGL context failures. This game is a
+  // 2D platformer, so Canvas is sufficient and more deterministic.
   const game = new Phaser.Game({
     type: Phaser.CANVAS,
     parent,
@@ -41,9 +51,19 @@ export function createWaitingGame(parent: HTMLElement, startLevel = 1): Phaser.G
 
   game.registry.set("startLevel", level);
 
-  game.events.on("error", (error: unknown) => {
-    console.error("[Fluttershy.EXE] Phaser error:", error);
+  const onError = (event: ErrorEvent) => {
+    if (event.error) showRuntimeError(parent, event.error);
+  };
+  const onRejection = (event: PromiseRejectionEvent) => {
+    showRuntimeError(parent, event.reason);
+  };
+  window.addEventListener("error", onError);
+  window.addEventListener("unhandledrejection", onRejection);
+  game.events.once("destroy", () => {
+    window.removeEventListener("error", onError);
+    window.removeEventListener("unhandledrejection", onRejection);
   });
+  game.events.on("error", (error: unknown) => showRuntimeError(parent, error));
 
   game.scene.add("preload", PreloadScene, false);
   game.scene.add("play", PlayScene, false);
