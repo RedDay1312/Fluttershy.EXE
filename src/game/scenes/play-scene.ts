@@ -3,7 +3,7 @@ import { bridge } from "../bridge";
 import { installControlsTest } from "../controls-test";
 import { playSfx, setMusicBed, hushMusic } from "../audio";
 import { readActions } from "../input";
-import { getLevel, type LevelDef, type Plat } from "../levels";
+import { getExpandedLevel, type LevelDef, type Plat } from "../levels-expanded";
 import { Pony } from "../player";
 import { useGameStore } from "@/store/game-store";
 
@@ -63,7 +63,7 @@ export class PlayScene extends Phaser.Scene {
     this.spokenNpc = new Set();
     this.nearNpc = null;
     const id = data.level ?? (this.registry.get("startLevel") as number) ?? 1;
-    this.level = getLevel(id);
+    this.level = getExpandedLevel(id);
     this.spawn = { ...this.level.spawn };
     const cp = useGameStore.getState().checkpoint;
     if (cp && cp.level === this.level.id && cp.x > 40) {
