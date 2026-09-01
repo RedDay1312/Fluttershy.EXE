@@ -3,6 +3,7 @@ import { endingFromStory } from "./story-state";
 
 export const SAVE_VERSION = 4;
 const KEY = "waiting.exe.save.v4";
+const LEGACY_KEYS = ["waiting.exe.save", "waiting.exe.story.v1"] as const;
 
 export type EndingId = "escape" | "merge" | "loop" | "kind";
 export type SaveData = {
@@ -45,22 +46,48 @@ export const defaultSave = (): SaveData => ({
   angelGone: false,
 });
 
-function migrate(raw: Partial<SaveData>): SaveData {
+function normalize(raw: Partial<SaveData>): SaveData {
   const base = defaultSave();
+  const level = Number.isFinite(raw.level) ? Math.min(7, Math.max(1, Math.floor(raw.level!))) : base.level;
+  const checkpoint =
+    raw.checkpoint &&
+    Number.isFinite(raw.checkpoint.level) &&
+    Number.isFinite(raw.checkpoint.x) &&
+    Number.isFinite(raw.checkpoint.y)
+      ? {
+          level: Math.min(7, Math.max(1, Math.floor(raw.checkpoint.level))),
+          x: raw.checkpoint.x,
+          y: raw.checkpoint.y,
+        }
+      : null;
+
   return {
     ...base,
     ...raw,
     version: SAVE_VERSION,
     lang: "ru",
-    notes: Array.isArray(raw.notes) ? raw.notes : [],
-    checkpoint: raw.checkpoint ?? null,
+    level,
+    notes: Array.isArray(raw.notes) ? [...new Set(raw.notes.filter((v): v is string => typeof v === "string"))] : [],
+    butterflies: Number.isFinite(raw.butterflies) ? Math.max(0, Math.floor(raw.butterflies!)) : base.butterflies,
+    marks: Number.isFinite(raw.marks) ? Math.max(0, Math.floor(raw.marks!)) : base.marks,
+    closeAttempts: Number.isFinite(raw.closeAttempts) ? Math.max(0, Math.floor(raw.closeAttempts!)) : base.closeAttempts,
+    skippedLines: Number.isFinite(raw.skippedLines) ? Math.max(0, Math.floor(raw.skippedLines!)) : base.skippedLines,
+    listenedLines: Number.isFinite(raw.listenedLines) ? Math.max(0, Math.floor(raw.listenedLines!)) : base.listenedLines,
+    deaths: Number.isFinite(raw.deaths) ? Math.max(0, Math.floor(raw.deaths!)) : base.deaths,
+    checkpoint,
+    hauntStage: Number.isFinite(raw.hauntStage) ? Math.max(0, Math.floor(raw.hauntStage!)) : base.hauntStage,
   };
 }
 
 export function loadSave(): SaveData {
   try {
     const raw = localStorage.getItem(KEY);
-    return raw ? migrate(JSON.parse(raw) as Partial<SaveData>) : defaultSave();
+    if (!raw) {
+      // Remove abandoned pre-v4 slots so they can never leak into a fresh campaign.
+      for (const legacyKey of LEGACY_KEYS) localStorage.removeItem(legacyKey);
+      return defaultSave();
+    }
+    return normalize(JSON.parse(raw) as Partial<SaveData>);
   } catch {
     return defaultSave();
   }
@@ -68,7 +95,7 @@ export function loadSave(): SaveData {
 
 export function writeSave(data: SaveData) {
   try {
-    localStorage.setItem(KEY, JSON.stringify({ ...data, version: SAVE_VERSION, lang: "ru" }));
+    localStorage.setItem(KEY, JSON.stringify({ ...normalize(data), version: SAVE_VERSION, lang: "ru" }));
   } catch {
     /* private mode */
   }
@@ -77,8 +104,8 @@ export function writeSave(data: SaveData) {
 export function clearSave() {
   try {
     localStorage.removeItem(KEY);
-    localStorage.removeItem("waiting.exe.save");
-    localStorage.removeItem("waiting.exe.story.v1");
+    for (const legacyKey of LEGACY_KEYS) localStorage.removeItem(legacyKey);
+    localStorage.removeItem("waiting.exe.story.v2");
   } catch {
     /* ignore */
   }
@@ -86,7 +113,10 @@ export function clearSave() {
 
 export function hasSave(): boolean {
   try {
-    return localStorage.getItem(KEY) !== null;
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return false;
+    const parsed = normalize(JSON.parse(raw) as Partial<SaveData>);
+    return parsed.seenIntro || parsed.level > 1 || parsed.notes.length > 0 || parsed.deaths > 0;
   } catch {
     return false;
   }
