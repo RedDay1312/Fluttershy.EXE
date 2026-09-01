@@ -6,6 +6,6 @@ export class BootScene extends Phaser.Scene {
   }
 
   create() {
-    this.scene.start("preload");
+    this.scene.start("splash");
   }
 }
