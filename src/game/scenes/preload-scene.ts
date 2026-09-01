@@ -48,7 +48,8 @@ export class PreloadScene extends Phaser.Scene {
       "fs-portrait", "fs-horror", "note", "flower", "door", "eyes", "spikes", "puddle", "flag",
       "plat-grass", "plat-wood", "plat-stone", "plat-blood", "plat-glitch", "plat-void",
       "tree-1", "tree-2", "tree-3", "bush", "grass", "rock", "mushroom", "vignette", "px",
-      "fg-grass", "cottage", "sign", "letter", "cutie", "gem", "poster"
+      "fg-grass", "cottage", "sign", "letter", "cutie", "gem", "poster",
+      "hang-orange", "hang-pink", "hang-purple", "hang-yellow", "skull"
     ];
     images.forEach((k) => this.load.image(k, `/sprites/${k}.png`));
 
