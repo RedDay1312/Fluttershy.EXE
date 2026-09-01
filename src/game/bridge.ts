@@ -38,6 +38,7 @@ type Handler = (e: BridgeEvent) => void;
 const handlers = new Set<Handler>();
 let checkpointBanner: HTMLDivElement | null = null;
 let checkpointTimer: number | null = null;
+let horrorBusy = false;
 
 function showCheckpointBanner() {
   if (typeof document === "undefined") return;
@@ -84,12 +85,170 @@ function showCheckpointBanner() {
   }, 1200);
 }
 
+function horrorLayer(ms: number) {
+  if (typeof document === "undefined") return null;
+  const el = document.createElement("div");
+  Object.assign(el.style, {
+    position: "fixed",
+    inset: "0",
+    zIndex: "10000",
+    pointerEvents: "none",
+    overflow: "hidden",
+  });
+  document.body.appendChild(el);
+  window.setTimeout(() => el.remove(), ms);
+  return el;
+}
+
+function spawnWatcher() {
+  if (typeof document === "undefined" || horrorBusy) return;
+  horrorBusy = true;
+  const layer = horrorLayer(1250);
+  if (!layer) return;
+
+  const side = Math.random() > 0.5 ? "left" : "right";
+  const x = side === "left" ? "7vw" : "93vw";
+  const y = `${18 + Math.random() * 58}vh`;
+
+  const head = document.createElement("div");
+  Object.assign(head.style, {
+    position: "absolute",
+    left: x,
+    top: y,
+    width: "92px",
+    height: "72px",
+    transform: "translate(-50%, -50%) scale(.72)",
+    borderRadius: "48% 48% 42% 42%",
+    background: "radial-gradient(ellipse at 50% 45%, rgba(18,18,18,.96) 0 42%, rgba(0,0,0,.72) 68%, transparent 72%)",
+    filter: "blur(.4px)",
+    opacity: "0",
+    transition: "opacity 90ms linear, transform 240ms ease-out",
+  });
+
+  const eyeStyle = {
+    position: "absolute",
+    top: "31px",
+    width: "13px",
+    height: "8px",
+    borderRadius: "50%",
+    background: "#eee",
+    boxShadow: "0 0 7px rgba(255,255,255,.9)",
+  } as const;
+  const eyeL = document.createElement("i");
+  const eyeR = document.createElement("i");
+  Object.assign(eyeL.style, eyeStyle, { left: "27px" });
+  Object.assign(eyeR.style, eyeStyle, { right: "27px" });
+  head.append(eyeL, eyeR);
+  layer.appendChild(head);
+
+  requestAnimationFrame(() => {
+    head.style.opacity = "1";
+    head.style.transform = "translate(-50%, -50%) scale(1)";
+  });
+  window.setTimeout(() => {
+    head.style.opacity = "0";
+    head.style.transform = "translate(-50%, -50%) scale(.94)";
+  }, 620);
+  window.setTimeout(() => { horrorBusy = false; }, 1300);
+}
+
+function glitchBurst() {
+  const layer = horrorLayer(520);
+  if (!layer) return;
+  for (let i = 0; i < 12; i++) {
+    const bar = document.createElement("div");
+    Object.assign(bar.style, {
+      position: "absolute",
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      width: `${4 + Math.random() * 30}%`,
+      height: `${1 + Math.random() * 7}px`,
+      background: i % 3 === 0 ? "rgba(255,20,35,.55)" : "rgba(235,235,235,.18)",
+      mixBlendMode: "screen",
+      transform: `translateX(${(Math.random() - .5) * 80}px)`,
+    });
+    layer.appendChild(bar);
+  }
+  const scan = document.createElement("div");
+  Object.assign(scan.style, {
+    position: "absolute",
+    inset: "0",
+    background: "repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,.045) 4px, transparent 5px)",
+    mixBlendMode: "screen",
+  });
+  layer.appendChild(scan);
+}
+
+function stareBurst() {
+  const layer = horrorLayer(2500);
+  if (!layer) return;
+  const eyes = document.createElement("div");
+  Object.assign(eyes.style, {
+    position: "absolute",
+    left: "50%",
+    top: "47%",
+    width: "190px",
+    height: "90px",
+    transform: "translate(-50%,-50%) scale(.25)",
+    opacity: "0",
+    background: "radial-gradient(ellipse at 30% 50%, #f5f5f5 0 9%, transparent 10%), radial-gradient(ellipse at 70% 50%, #f5f5f5 0 9%, transparent 10%)",
+    filter: "drop-shadow(0 0 16px rgba(255,255,255,.35))",
+    transition: "opacity 180ms ease, transform 900ms cubic-bezier(.18,.8,.2,1)",
+  });
+  layer.appendChild(eyes);
+  requestAnimationFrame(() => { eyes.style.opacity = "1"; eyes.style.transform = "translate(-50%,-50%) scale(1)"; });
+  window.setTimeout(() => { eyes.style.opacity = "0"; }, 1450);
+}
+
+function deathBurst() {
+  const layer = horrorLayer(420);
+  if (!layer) return;
+  Object.assign(layer.style, {
+    background: "radial-gradient(circle at 50% 50%, rgba(255,255,255,.35), rgba(95,0,0,.45) 30%, rgba(0,0,0,.94) 85%)",
+    mixBlendMode: "normal",
+  });
+}
+
+function shakeScreen() {
+  if (typeof document === "undefined") return;
+  const root = document.body;
+  root.animate(
+    [
+      { transform: "translate(0,0)" },
+      { transform: "translate(-7px,2px)" },
+      { transform: "translate(5px,-3px)" },
+      { transform: "translate(-3px,1px)" },
+      { transform: "translate(0,0)" },
+    ],
+    { duration: 230, easing: "steps(4,end)" },
+  );
+}
+
 export const bridge = {
   emit(e: BridgeEvent) {
     if (e.type === "checkpoint") {
       playSfx("checkpoint");
       showCheckpointBanner();
     }
+
+    // Horror presentation layer: rare, short and unpredictable so the player
+    // doesn't get used to a permanent effect.
+    if (e.type === "whisper") {
+      if (Math.random() < 0.7) spawnWatcher();
+    } else if (e.type === "glitch") {
+      glitchBurst();
+    } else if (e.type === "stare") {
+      stareBurst();
+    } else if (e.type === "died") {
+      deathBurst();
+    } else if (e.type === "shake-window") {
+      shakeScreen();
+    } else if (e.type === "overlay" && e.kind === "glitch") {
+      glitchBurst();
+    } else if (e.type === "overlay" && e.kind === "black") {
+      if (Math.random() < 0.45) window.setTimeout(spawnWatcher, Math.min(900, e.ms ?? 900));
+    }
+
     handlers.forEach((h) => h(e));
   },
   on(h: Handler) {
