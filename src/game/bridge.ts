@@ -91,6 +91,7 @@ function showLoreNote(id: string) {
   const finish = () => {
     if (!loreNoteOpen) return;
     loreNoteOpen = false;
+    window.removeEventListener("keydown", onKey, true);
     clearInput();
     overlay.style.opacity = "0";
     paper.style.transform = "translateY(12px) scale(.98) rotate(0deg)";
@@ -107,7 +108,6 @@ function showLoreNote(id: string) {
     if (e.code === "Escape" || e.code === "KeyE" || e.code === "Enter") { e.preventDefault(); e.stopPropagation(); finish(); }
   };
   window.addEventListener("keydown", onKey, true);
-  window.setTimeout(() => window.removeEventListener("keydown", onKey, true), 120000);
   requestAnimationFrame(() => { overlay.style.opacity = "1"; paper.style.transform = "translateY(0) scale(1) rotate(-.35deg)"; });
 }
 
