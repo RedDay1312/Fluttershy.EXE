@@ -1,6 +1,7 @@
 import { setStoryFlag, advanceStory, type StoryFlag } from "./story-state";
 import { bridge } from "./bridge";
 import "./horror-cutscenes";
+import "./player-address";
 
 export type HorrorBeat={level:number;fear:number;event:"glitch"|"flicker"|"distort"|"shake"|"black"|"stare";ms?:number;flag?:StoryFlag};
 const BEATS:HorrorBeat[]=[
