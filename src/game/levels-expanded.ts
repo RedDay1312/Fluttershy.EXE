@@ -106,13 +106,11 @@ function addGroundSpikes(platforms: Plat[], offset: number, level: number, pass:
   return hazards;
 }
 
-function supportedCheckpoint(c: { x: number; y: number }, platforms: Plat[]): boolean {
-  return platforms.some((p) => {
-    if (p.w < 70) return false;
-    const left = p.x + 18, right = p.x + p.w - 18;
-    const top = p.y;
-    return c.x >= left && c.x <= right && Math.abs((top - 104) - c.y) < 150;
-  });
+function findCheckpointSupport(c: { x: number; y: number }, platforms: Plat[]) {
+  return platforms
+    .filter((p) => p.w >= 70 && c.x >= p.x + 24 && c.x <= p.x + p.w - 24)
+    .map((p) => ({ p, distance: Math.abs((p.y - 104) - c.y) }))
+    .sort((a, b) => a.distance - b.distance)[0]?.p;
 }
 
 function sanitizeCheckpoints(checkpoints: LevelDef["checkpoints"], platforms: Plat[]): LevelDef["checkpoints"] {
@@ -120,11 +118,14 @@ function sanitizeCheckpoints(checkpoints: LevelDef["checkpoints"], platforms: Pl
   const seen = new Set<string>();
   for (const c of checkpoints) {
     if (!Number.isFinite(c.x) || !Number.isFinite(c.y)) continue;
-    if (!supportedCheckpoint(c, platforms)) continue;
-    const key = `${Math.round(c.x)}:${Math.round(c.y)}`;
+    const support = findCheckpointSupport(c, platforms);
+    if (!support) continue;
+    const x = Math.round(Math.max(support.x + 28, Math.min(support.x + support.w - 28, c.x)));
+    const y = support.y - 104;
+    const key = `${x}:${y}`;
     if (seen.has(key)) continue;
     seen.add(key);
-    result.push(c);
+    result.push({ x, y });
   }
   return result;
 }
