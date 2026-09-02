@@ -98,7 +98,6 @@ function showLoreNote(id: string) {
     window.setTimeout(() => overlay.remove(), 190);
     window.setTimeout(() => {
       handlers.forEach((h) => h({ type: "nudge-dialogue" }));
-      handlers.forEach((h) => h({ type: "nudge-dialogue" }));
     }, 30);
   };
 
@@ -113,7 +112,7 @@ function showLoreNote(id: string) {
 
 function spawnWatcher() {
   if (typeof document === "undefined" || horrorBusy) return;
-  horrorBusy=true; const layer=horrorLayer(1250); if(!layer)return;
+  horrorBusy=true; const layer=horrorLayer(1250); if(!layer){horrorBusy=false;return;}
   const side=Math.random()>.5?"left":"right", x=side==="left"?"7vw":"93vw", y=`${18+Math.random()*58}vh`;
   const head=document.createElement("div"); Object.assign(head.style,{position:"absolute",left:x,top:y,width:"92px",height:"72px",transform:"translate(-50%,-50%) scale(.72)",borderRadius:"48% 48% 42% 42%",background:"radial-gradient(ellipse at 50% 45%, rgba(18,18,18,.96) 0 42%, rgba(0,0,0,.72) 68%, transparent 72%)",filter:"blur(.4px)",opacity:"0",transition:"opacity 90ms linear, transform 240ms ease-out"});
   const eyeStyle={position:"absolute",top:"31px",width:"13px",height:"8px",borderRadius:"50%",background:"#eee",boxShadow:"0 0 7px rgba(255,255,255,.9)"} as const;
@@ -137,7 +136,7 @@ function stareBurst() {
 }
 
 function screamerBurst() {
-  if(typeof document==="undefined"||horrorBusy)return; horrorBusy=true; const layer=horrorLayer(1050); if(!layer)return;
+  if(typeof document==="undefined"||horrorBusy)return; horrorBusy=true; const layer=horrorLayer(1050); if(!layer){horrorBusy=false;return;}
   const flash=document.createElement("div");Object.assign(flash.style,{position:"absolute",inset:"0",background:"#000",opacity:"0",transition:"opacity 45ms linear"});layer.appendChild(flash);
   const face=document.createElement("div");Object.assign(face.style,{position:"absolute",left:"50%",top:"50%",width:"min(86vw,860px)",height:"min(86vh,860px)",transform:"translate(-50%,-50%) scale(.28) rotate(-3deg)",opacity:"0",backgroundImage:"radial-gradient(ellipse at 50% 48%, rgba(12,12,12,.98) 0 28%, transparent 29%), radial-gradient(ellipse at 36% 37%, rgba(245,245,245,.96) 0 7%, transparent 8%), radial-gradient(ellipse at 64% 37%, rgba(245,245,245,.96) 0 7%, transparent 8%), radial-gradient(ellipse at 36% 37%, #090909 0 2.2%, transparent 2.8%), radial-gradient(ellipse at 64% 37%, #090909 0 2.2%, transparent 2.8%), radial-gradient(ellipse at 50% 66%, rgba(120,0,0,.9) 0 13%, transparent 14%)",filter:"contrast(1.5) saturate(.65) brightness(.62) drop-shadow(0 0 30px rgba(0,0,0,.98))",transition:"opacity 40ms linear, transform 120ms cubic-bezier(.08,.9,.2,1)"});layer.appendChild(face);
   requestAnimationFrame(()=>{flash.style.opacity="1";face.style.opacity="1";face.style.transform=`translate(-50%,-50%) scale(${1.04+Math.random()*.18}) rotate(${(Math.random()-.5)*5}deg)`;});
@@ -173,7 +172,7 @@ function blackoutAmbush() {
   requestAnimationFrame(()=>{black.style.opacity=".94";});
   window.setTimeout(()=>{whisper.style.opacity="1";},260);
   window.setTimeout(()=>{whisper.style.opacity="0";black.style.opacity="0";},520);
-  window.setTimeout(()=>{ if(Math.random()<.7) instantPonyFlash(); },650);
+  window.setTimeout(()=>{ if(Math.random()<.7){ horrorBusy=false; instantPonyFlash(); } },650);
   playHorrorSfx("breath");
   window.setTimeout(()=>{horrorBusy=false;},1450);
 }
