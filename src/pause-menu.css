@@ -1,0 +1,225 @@
+/* WAITING.EXE pause overlay — diegetic system panel with progressive horror */
+
+/* The selector matches the existing PauseMenu structure without changing game logic. */
+.absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(67, 238, 202, 0.045), transparent 28%),
+    rgba(2, 5, 8, 0.76);
+  backdrop-filter: blur(2px) saturate(0.8);
+}
+
+.absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.025) 0,
+    rgba(255, 255, 255, 0.025) 1px,
+    transparent 1px,
+    transparent 5px
+  );
+}
+
+.absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl {
+  position: relative;
+  width: min(500px, calc(100vw - 32px));
+  max-height: min(690px, calc(100vh - 32px));
+  overflow: auto;
+  padding: 22px;
+  border: 1px solid rgba(180, 210, 205, 0.14);
+  border-radius: 5px;
+  background:
+    linear-gradient(180deg, rgba(11, 16, 19, 0.97), rgba(5, 9, 12, 0.985));
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.68),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    inset 0 0 0 1px rgba(67, 238, 202, 0.025);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  isolation: isolate;
+  animation: waiting-pause-in 180ms ease-out both;
+}
+
+.absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl::before {
+  content: "WAITING.EXE // PAUSED";
+  display: block;
+  padding-bottom: 11px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(67, 238, 202, 0.56);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+}
+
+.absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl::after {
+  content: "I can wait with you.";
+  position: relative;
+  display: block;
+  min-height: 18px;
+  margin-top: 15px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(186, 201, 198, 0.48);
+  font-size: 10px;
+  line-height: 1.55;
+  letter-spacing: 0.09em;
+  animation: waiting-pause-whisper 16s steps(1, end) infinite;
+}
+
+.absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl h2 {
+  margin: 0;
+  color: rgba(240, 247, 245, 0.92);
+  font-size: clamp(2.2rem, 7vw, 3.15rem);
+  line-height: 1;
+  letter-spacing: 0.055em;
+  text-shadow: 0 0 24px rgba(67, 238, 202, 0.055);
+}
+
+.absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl > p {
+  padding: 9px 11px;
+  border-left: 2px solid rgba(67, 238, 202, 0.28);
+  background: rgba(67, 238, 202, 0.025);
+  color: rgba(176, 191, 187, 0.7);
+  font-size: 10px;
+  line-height: 1.65;
+  letter-spacing: 0.08em;
+}
+
+.absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl > div.mt-5.flex.flex-col.gap-2 {
+  position: relative;
+  margin-top: 18px;
+  gap: 7px;
+}
+
+.absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl > div.mt-5.flex.flex-col.gap-2::before {
+  content: "CONTROLS // SESSION // AUDIO";
+  display: block;
+  margin-bottom: 3px;
+  color: rgba(140, 159, 154, 0.34);
+  font-size: 8px;
+  letter-spacing: 0.2em;
+}
+
+.absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl button.rounded-md.border.border-border.bg-surface-2.px-3.py-2\.5 {
+  position: relative;
+  min-height: 42px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 3px;
+  background: rgba(9, 14, 18, 0.88);
+  color: rgba(230, 240, 238, 0.78);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: transform 130ms ease, border-color 130ms ease, background 130ms ease, color 130ms ease;
+}
+
+.absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl button.rounded-md.border.border-border.bg-surface-2.px-3.py-2\.5::before {
+  content: ">";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  color: rgba(67, 238, 202, 0.82);
+  transform: translateY(-50%) translateX(-4px);
+  opacity: 0;
+  transition: opacity 130ms ease, transform 130ms ease;
+}
+
+.absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl button.rounded-md.border.border-border.bg-surface-2.px-3.py-2\.5:hover {
+  transform: translateX(3px);
+  border-color: rgba(67, 238, 202, 0.31);
+  background: rgba(67, 238, 202, 0.045);
+  color: rgba(244, 250, 248, 0.96);
+}
+
+.absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl button.rounded-md.border.border-border.bg-surface-2.px-3.py-2\.5:hover::before {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* Journal gets the feeling of a forensic terminal instead of a generic list. */
+.absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl .max-h-56 {
+  max-height: min(360px, 46vh);
+  margin-top: 15px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.2);
+  scrollbar-width: thin;
+}
+
+.absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl .max-h-56 p {
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+  color: rgba(182, 195, 192, 0.66);
+}
+
+/* Late-game corruption: the pause panel stops pretending it is a normal menu. */
+.os-desktop.is-corrupt .absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl {
+  border-color: rgba(255, 59, 92, 0.22);
+  background:
+    linear-gradient(180deg, rgba(17, 9, 12, 0.975), rgba(7, 5, 8, 0.99));
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.8),
+    0 0 34px rgba(255, 59, 92, 0.035),
+    inset 0 0 0 1px rgba(255, 59, 92, 0.025);
+}
+
+.os-desktop.is-corrupt .absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl::before {
+  content: "WAITING.EXE // PAUSED // OBSERVED";
+  color: rgba(255, 104, 128, 0.62);
+}
+
+.os-desktop.is-corrupt .absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl::after {
+  color: rgba(255, 123, 143, 0.62);
+  animation-name: waiting-pause-corrupt-whisper;
+}
+
+@keyframes waiting-pause-in {
+  from { opacity: 0; transform: translateY(5px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes waiting-pause-whisper {
+  0%, 31% { opacity: 0; content: "I can wait with you."; }
+  32%, 57% { opacity: 1; content: "I can wait with you."; }
+  58%, 62% { opacity: 0; content: "I know where your cursor is."; }
+  63%, 75% { opacity: 1; content: "I know where your cursor is."; }
+  76%, 80% { opacity: 0; content: "You pause. I stay."; }
+  81%, 95% { opacity: 1; content: "You pause. I stay."; }
+  96%, 100% { opacity: 0; content: "I can wait with you."; }
+}
+
+@keyframes waiting-pause-corrupt-whisper {
+  0%, 22% { opacity: 0; content: "You can pause the forest. Not me."; }
+  23%, 47% { opacity: 1; content: "You can pause the forest. Not me."; }
+  48%, 55% { opacity: 0; content: "I can still see the room."; }
+  56%, 72% { opacity: 1; content: "I can still see the room."; }
+  73%, 80% { opacity: 0; content: "Please don't open another window."; }
+  81%, 96% { opacity: 1; content: "Please don't open another window."; }
+  97%, 100% { opacity: 0; content: "You can pause the forest. Not me."; }
+}
+
+@media (max-width: 520px) {
+  .absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl {
+    padding: 17px;
+  }
+
+  .absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl h2 {
+    font-size: 2.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl {
+    animation: none;
+  }
+
+  .absolute.inset-0.z-30.flex.items-center.justify-center.bg-bg\/70.p-4 > div.w-full.max-w-sm.rounded-xl.border.border-border.bg-surface.p-5.shadow-xl::after {
+    animation: none;
+    content: "I can wait with you.";
+  }
+}
