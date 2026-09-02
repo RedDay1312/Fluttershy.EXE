@@ -47,6 +47,65 @@ export class Pony {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
     body.setDrag(0, 0);
     body.setAllowGravity(false);
+    this.polishGrass(scene);
+  }
+
+  private polishGrass(scene: Phaser.Scene) {
+    const children = scene.children.list;
+    const platforms = children.filter((child) => {
+      const key = (child as any).texture?.key;
+      return typeof key === "string" && key.startsWith("plat-");
+    }) as Phaser.GameObjects.GameObject[];
+
+    for (const child of children) {
+      const obj = child as Phaser.GameObjects.Image | Phaser.GameObjects.Sprite;
+      if ((obj as any).texture?.key !== "grass") continue;
+      const x = obj.x;
+      const support = platforms
+        .map((p: any) => {
+          const b = p.getBounds();
+          return { b, d: Math.abs((b.left + b.right) / 2 - x) };
+        })
+        .filter(({ b }) => x >= b.left - 6 && x <= b.right + 6)
+        .sort((a, b) => a.d - b.d)[0];
+
+      // Never draw decorative grass over a gap.
+      if (!support) {
+        obj.setVisible(false);
+        continue;
+      }
+
+      // Break the artificial straight line while keeping grass attached to the surface.
+      obj.y = support.b.top + 3 + Phaser.Math.Between(-3, 4);
+      obj.x += Phaser.Math.Between(-16, 16);
+      obj.setScale(Phaser.Math.FloatBetween(0.48, 0.72));
+      obj.setFlipX(Math.random() > 0.5);
+      obj.setDepth(8 + Phaser.Math.FloatBetween(0, 0.5));
+    }
+  }
+
+  private findSafeRespawn(scene: Phaser.Scene, x: number, y: number) {
+    const platforms = scene.children.list
+      .filter((child) => {
+        const key = (child as any).texture?.key;
+        return typeof key === "string" && key.startsWith("plat-");
+      })
+      .map((child: any) => ({ child, bounds: child.getBounds() }))
+      .filter(({ bounds }) => bounds.width > 30);
+
+    const underX = platforms
+      .filter(({ bounds }) => x >= bounds.left + 12 && x <= bounds.right - 12)
+      .sort((a, b) => Math.abs(a.bounds.top - y) - Math.abs(b.bounds.top - y));
+
+    const target = underX[0] ?? platforms.sort(
+      (a, b) => Math.abs((a.bounds.left + a.bounds.right) / 2 - x) - Math.abs((b.bounds.left + b.bounds.right) / 2 - x),
+    )[0];
+    if (!target) return { x, y: Math.min(y, 500) };
+
+    const safeX = Phaser.Math.Clamp(x, target.bounds.left + 28, target.bounds.right - 28);
+    // Body bottom is roughly spriteY + 97 with the current offset/size.
+    const safeY = target.bounds.top - 104;
+    return { x: safeX, y: safeY };
   }
 
   setDistorted(v: boolean) {
@@ -83,6 +142,7 @@ export class Pony {
   }
 
   respawn(x: number, y: number) {
+    const safe = this.findSafeRespawn(this.sprite.scene, x, y);
     this.dead = false;
     this.hurtT = 0;
     this.looking = false;
@@ -91,7 +151,7 @@ export class Pony {
     this.idleMs = 0;
     this.invulnerableMs = RESPAWN_INVULN;
     this.jumpHeldPrev = false;
-    this.sprite.setPosition(x, y);
+    this.sprite.setPosition(safe.x, safe.y);
     this.sprite.setVelocity(0, 0);
     this.sprite.setAlpha(1);
     this.sprite.clearTint();
