@@ -3,12 +3,14 @@ import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { PlayerAwareness } from "@/components/player-awareness";
 import { DeathReactions } from "@/components/death-reactions";
+import { DesktopHub } from "@/components/desktop-hub";
 import appCss from "../styles.css?url";
 import bootCss from "../boot-screen.css?url";
 import menuCss from "../main-menu.css?url";
 import pauseCss from "../pause-menu.css?url";
 import awarenessCss from "../player-awareness.css?url";
 import deathCss from "../death-reactions.css?url";
+import desktopHubCss from "../desktop-hub.css?url";
 
 const APP_NAME = "WAITING";
 
@@ -32,6 +34,7 @@ export const Route = createRootRoute({
       { rel: "stylesheet", href: pauseCss },
       { rel: "stylesheet", href: awarenessCss },
       { rel: "stylesheet", href: deathCss },
+      { rel: "stylesheet", href: desktopHubCss },
       { rel: "manifest", href: "/__grok/manifest.webmanifest" },
       { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
       {
@@ -51,6 +54,7 @@ export const Route = createRootRoute({
           <Outlet />
           <PlayerAwareness />
           <DeathReactions />
+          <DesktopHub />
         </AuthProvider>
         <Scripts />
       </body>
