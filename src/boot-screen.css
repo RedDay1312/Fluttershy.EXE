@@ -1,0 +1,188 @@
+/* WAITING.EXE boot screen — cinematic startup polish */
+
+button.flex.h-full.w-full.flex-col.items-start.justify-center {
+  position: relative;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+  padding: clamp(24px, 6vw, 72px) !important;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(126, 200, 201, 0.08), transparent 28%),
+    radial-gradient(circle at 50% 78%, rgba(154, 36, 48, 0.055), transparent 42%),
+    linear-gradient(180deg, #040508 0%, #090b0f 52%, #020305 100%) !important;
+  color: #efe6d6 !important;
+  isolation: isolate;
+  cursor: pointer;
+}
+
+button.flex.h-full.w-full.flex-col.items-start.justify-center::before {
+  content: "";
+  position: absolute;
+  inset: clamp(10px, 2vw, 22px);
+  border: 1px solid rgba(239, 230, 214, 0.055);
+  pointer-events: none;
+  z-index: 0;
+}
+
+button.flex.h-full.w-full.flex-col.items-start.justify-center::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0.28;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0 3px,
+    rgba(255, 255, 255, 0.018) 4px,
+    transparent 5px
+  );
+  mix-blend-mode: screen;
+}
+
+button.flex.h-full.w-full.flex-col.items-start.justify-center > p:first-child {
+  position: relative;
+  z-index: 2;
+  margin: 0 !important;
+  font-size: clamp(4.1rem, 11vw, 8.2rem) !important;
+  line-height: 0.82 !important;
+  letter-spacing: 0.18em !important;
+  text-indent: 0.18em;
+  text-transform: uppercase;
+  text-align: center;
+  color: #f0eadf !important;
+  text-shadow:
+    0 0 36px rgba(126, 200, 201, 0.08),
+    0 12px 48px rgba(0, 0, 0, 0.72);
+  animation: waiting-logo-breathe 4.8s ease-in-out infinite;
+}
+
+button.flex.h-full.w-full.flex-col.items-start.justify-center > p:nth-child(2) {
+  position: relative;
+  z-index: 2;
+  margin: 18px 0 0 !important;
+  max-width: 520px;
+  color: rgba(154, 147, 136, 0.72) !important;
+  font: 500 10px/1.6 var(--font-mono) !important;
+  letter-spacing: 0.22em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+button.flex.h-full.w-full.flex-col.items-start.justify-center > div.mt-6.space-y-1.text-accent {
+  position: relative;
+  z-index: 2;
+  width: min(560px, 92vw);
+  margin-top: 46px !important;
+  padding: 18px 20px 19px;
+  border: 1px solid rgba(126, 200, 201, 0.13);
+  background: rgba(3, 6, 8, 0.62);
+  box-shadow:
+    0 18px 46px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
+  text-align: left;
+}
+
+button.flex.h-full.w-full.flex-col.items-start.justify-center > div.mt-6.space-y-1.text-accent::before {
+  content: "BOOT SEQUENCE";
+  display: block;
+  margin-bottom: 11px;
+  color: rgba(126, 200, 201, 0.44);
+  font: 500 9px/1 var(--font-mono);
+  letter-spacing: 0.28em;
+}
+
+button.flex.h-full.w-full.flex-col.items-start.justify-center > div.mt-6.space-y-1.text-accent::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 1px;
+  margin-top: 16px;
+  background: linear-gradient(90deg, rgba(126, 200, 201, 0.6), rgba(126, 200, 201, 0));
+  transform-origin: left;
+  animation: waiting-boot-progress 2.35s linear both;
+}
+
+button.flex.h-full.w-full.flex-col.items-start.justify-center > div.mt-6.space-y-1.text-accent > p {
+  margin: 0 !important;
+  color: rgba(126, 200, 201, 0.7) !important;
+  font: 11px/1.6 var(--font-mono) !important;
+  letter-spacing: 0.035em;
+}
+
+button.flex.h-full.w-full.flex-col.items-start.justify-center > div.mt-6.space-y-1.text-accent > p:nth-of-type(5),
+button.flex.h-full.w-full.flex-col.items-start.justify-center > div.mt-6.space-y-1.text-accent > p:nth-of-type(6) {
+  color: rgba(154, 36, 48, 0.76) !important;
+}
+
+button.flex.h-full.w-full.flex-col.items-start.justify-center > div.mt-6.space-y-1.text-accent > p.mt-4 {
+  margin-top: 18px !important;
+  padding-top: 13px;
+  border-top: 1px solid rgba(239, 230, 214, 0.07);
+  color: rgba(239, 230, 214, 0.92) !important;
+  text-align: center;
+  font-weight: 600 !important;
+  letter-spacing: 0.24em !important;
+  text-transform: uppercase;
+  text-shadow: 0 0 18px rgba(239, 230, 214, 0.08);
+  animation: waiting-prompt-pulse 1.8s ease-in-out infinite;
+}
+
+button.flex.h-full.w-full.flex-col.items-start.justify-center > div.mt-6.space-y-1.text-accent > span {
+  display: inline-block;
+  margin-top: 8px;
+  width: 6px;
+  height: 13px;
+  opacity: 0.9;
+}
+
+@keyframes waiting-logo-breathe {
+  0%, 100% { opacity: 0.94; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.008); }
+}
+
+@keyframes waiting-boot-progress {
+  from { transform: scaleX(0); opacity: 0.15; }
+  to { transform: scaleX(1); opacity: 0.9; }
+}
+
+@keyframes waiting-prompt-pulse {
+  0%, 100% { opacity: 0.58; }
+  50% { opacity: 1; }
+}
+
+@media (max-width: 767px) {
+  button.flex.h-full.w-full.flex-col.items-start.justify-center {
+    padding: 22px !important;
+  }
+
+  button.flex.h-full.w-full.flex-col.items-start.justify-center > p:first-child {
+    font-size: clamp(3rem, 16vw, 5.2rem) !important;
+    letter-spacing: 0.12em !important;
+    text-indent: 0.12em;
+  }
+
+  button.flex.h-full.w-full.flex-col.items-start.justify-center > p:nth-child(2) {
+    margin-top: 14px !important;
+    max-width: 330px;
+    font-size: 9px !important;
+  }
+
+  button.flex.h-full.w-full.flex-col.items-start.justify-center > div.mt-6.space-y-1.text-accent {
+    width: min(100%, 430px);
+    margin-top: 34px !important;
+    padding: 14px 15px 16px;
+  }
+
+  button.flex.h-full.w-full.flex-col.items-start.justify-center > div.mt-6.space-y-1.text-accent > p {
+    font-size: 10px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.flex.h-full.w-full.flex-col.items-start.justify-center > p:first-child,
+  button.flex.h-full.w-full.flex-col.items-start.justify-center > div.mt-6.space-y-1.text-accent > p.mt-4 {
+    animation: none !important;
+  }
+}
