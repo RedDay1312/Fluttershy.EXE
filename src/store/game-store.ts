@@ -33,6 +33,9 @@ type GameStore = SaveData & {
   whisper: string | null;
   haunt: HauntState;
   restoreFail: string | null;
+  deathStreak: number;
+  deathReactionKey: string | null;
+  deathReactionId: number;
   hydrate: () => void;
   persist: () => void;
   setLang: (lang: Lang) => void;
@@ -135,6 +138,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   whisper: null,
   haunt: EMPTY_HAUNT,
   restoreFail: null,
+  deathStreak: 0,
+  deathReactionKey: null,
+  deathReactionId: 0,
 
   hydrate() {
     clearTimers();
@@ -145,6 +151,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       haunt,
       corruptDesktop: s.hauntStage >= 3 || s.saveLabel === "wait",
       desktopPony: s.hauntStage >= 4 || s.saveLabel === "wait",
+      deathStreak: 0,
+      deathReactionKey: null,
+      deathReactionId: 0,
     });
   },
 
@@ -218,13 +227,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       toast: null,
       whisper: null,
       haunt: EMPTY_HAUNT,
-      openFile: null,
       restoreFail: null,
+      deathStreak: 0,
+      deathReactionKey: null,
+      deathReactionId: get().deathReactionId + 1,
     });
     get().persist();
   },
 
   setPhase(p) {
+    if (p === "playing" && get().phase === "paused") {
+      set({ phase: p });
+      return;
+    }
     if (p === "paused" && get().phase === "playing" && get().level >= 3 && !get().dialogue) {
       set({ phase: p });
       get().setWhisper("whisper.6");
@@ -305,14 +320,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   addDeath() {
-    set({ deaths: get().deaths + 1 });
+    const streak = Math.min(12, get().deathStreak + 1);
+    const deaths = get().deaths + 1;
+    const stage = Math.max(get().hauntStage, get().level >= 5 ? 5 : 0);
+    const reactionKey =
+      streak >= 8 || deaths >= 12
+        ? "death.react.8"
+        : streak >= 6
+          ? "death.react.6"
+          : streak >= 4
+            ? "death.react.4"
+            : streak >= 3
+              ? "death.react.3"
+              : streak >= 2
+                ? "death.react.2"
+                : stage >= 4
+                  ? "death.react.late"
+                  : "death.react.1";
+    set({ deaths, deathStreak: streak, deathReactionKey: reactionKey, deathReactionId: get().deathReactionId + 1 });
+    if (streak >= 4 || deaths >= 8) get().setWhisper(reactionKey);
     get().persist();
   },
 
   setLevel(n) {
     const level = Math.min(7, Math.max(1, Math.floor(n)));
     const label = level >= 6 ? "wait" : level >= 4 ? "blood" : level >= 2 ? "fog" : get().saveLabel === "wait" ? "wait" : "ok";
-    set({ level, saveLabel: label, corruptDesktop: level >= 5 || get().hauntStage >= 3, checkpoint: null });
+    set({ level, saveLabel: label, corruptDesktop: level >= 5 || get().hauntStage >= 3, checkpoint: null, deathStreak: 0 });
     get().persist();
   },
 
@@ -382,6 +415,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       haunt: hauntFor(next.hauntStage),
       openFile: null,
       restoreFail: null,
+      deathStreak: 0,
+      deathReactionKey: null,
+      deathReactionId: get().deathReactionId + 1,
     });
     get().persist();
   },
@@ -400,7 +436,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     toastTimer = window.setTimeout(() => {
       toastTimer = null;
       set({ toast: null });
-    }, 2400);
+    }, 2600);
   },
 
   setShake(v) {
@@ -410,138 +446,55 @@ export const useGameStore = create<GameStore>((set, get) => ({
       shakeTimer = window.setTimeout(() => {
         shakeTimer = null;
         set({ windowShake: false });
-      }, 700);
+      }, 420);
     }
   },
 
   setWhisper(key) {
     if (whisperTimer !== null) window.clearTimeout(whisperTimer);
-    set({ whisper: key });
-    if (key) {
-      whisperTimer = window.setTimeout(() => {
-        whisperTimer = null;
-        set({ whisper: null });
-      }, 2800);
+    if (!key) {
+      set({ whisper: null });
+      return;
     }
+    set({ whisper: key });
+    whisperTimer = window.setTimeout(() => {
+      whisperTimer = null;
+      set({ whisper: null });
+    }, 3400);
   },
 
   beginInterlude(after) {
-    const level = Math.min(7, Math.max(0, Math.floor(after)));
-    const haunt = hauntFor(level);
-    const label = level >= 4 ? "wait" : level >= 3 ? "blood" : level >= 2 ? "fog" : "ok";
-    set({
-      phase: "desktop",
-      osWindow: level >= 1 ? "notes" : null,
-      interludeActive: true,
-      skipTitle: true,
-      hauntStage: level,
-      haunt,
-      saveLabel: label,
-      desktopPony: level >= 4,
-      corruptDesktop: level >= 3,
-      cursorFlee: level >= 5,
-      sessionStarted: false,
-      dialogue: null,
-      dialogueQueue: [],
-      overlay: EMPTY_OVERLAY,
-    });
-    get().persist();
-    get().showToast("toast.file");
+    const run = get().runId;
+    set({ interludeActive: true, sessionStarted: false, phase: "desktop" });
+    window.setTimeout(() => {
+      if (get().runId !== run) return;
+      set({ interludeActive: false, sessionStarted: true, phase: "playing" });
+    }, Math.max(0, after));
   },
 
   setAngelGone() {
-    if (get().angelGone) return;
     set({ angelGone: true });
     get().persist();
   },
 
   tryRestore(name) {
     if (restoreTimer !== null) window.clearTimeout(restoreTimer);
-    const safeName = name.trim().slice(0, 80);
-    set({ restoreFail: safeName || "UNKNOWN_FILE" });
+    const clean = name.trim().toLowerCase();
+    if (!clean || get().level < 2) {
+      set({ restoreFail: "restore.denied" });
+      return;
+    }
+    set({ restoreFail: null });
     restoreTimer = window.setTimeout(() => {
       restoreTimer = null;
-      set({ restoreFail: null });
-    }, 2200);
+      const s = get();
+      if (clean.includes("angel") && s.angelGone) {
+        set({ restoreFail: "restore.angel" });
+      } else if (clean.includes("save") || clean.includes("game")) {
+        set({ restoreFail: "restore.fake" });
+      } else {
+        set({ restoreFail: "restore.denied" });
+      }
+    }, 650);
   },
 }));
-
-export function bindBridge() {
-  return bridge.on((e) => {
-    const s = useGameStore.getState();
-    switch (e.type) {
-      case "dialogue":
-        s.queueDialogue([{ key: e.key, speaker: e.speaker ?? "fs", look: e.look, nameKey: e.nameKey }]);
-        break;
-      case "overlay":
-        s.showOverlay(e.kind, e.textKey, e.ms);
-        break;
-      case "note": {
-        const first = s.notes.length === 0;
-        s.collectNote(e.id);
-        s.showToast(e.id === "10" ? "toast.letter" : e.id === "16" ? "toast.gem" : "toast.note");
-        if (first) s.queueDialogue([{ key: "d.note", speaker: "fs" }]);
-        else if (e.id === "10") s.queueDialogue([{ key: "d.letter", speaker: "fs" }]);
-        else if (e.id === "16") s.queueDialogue([{ key: "d.gem", speaker: "fs" }]);
-        break;
-      }
-      case "collect":
-        if (e.kind === "butterfly") s.addButterfly();
-        if (e.kind === "mark") s.addMark();
-        if (e.kind === "letter") {
-          s.showToast("toast.letter");
-          s.queueDialogue([{ key: "d.letter", speaker: "fs" }]);
-        }
-        if (e.kind === "gem") {
-          s.showToast("toast.gem");
-          s.queueDialogue([{ key: "d.gem", speaker: "fs" }]);
-        }
-        break;
-      case "died":
-        s.addDeath();
-        break;
-      case "level-clear":
-        s.setLevel(e.level + 1);
-        break;
-      case "interlude":
-        s.beginInterlude(e.after);
-        break;
-      case "ending":
-        s.finish();
-        break;
-      case "loaded":
-        s.setLoading(false, 1);
-        break;
-      case "pause-request":
-        if (s.phase === "playing") s.setPhase("paused");
-        break;
-      case "cursor-flee":
-        s.setCursorFlee(true);
-        window.setTimeout(() => s.setCursorFlee(false), 1800);
-        break;
-      case "desktop-pony":
-        s.setDesktopPony(true);
-        break;
-      case "toast":
-        s.showToast(e.key);
-        break;
-      case "shake-window":
-        s.setShake(true);
-        break;
-      case "whisper":
-        s.setWhisper(e.key);
-        break;
-      case "checkpoint":
-        s.setCheckpoint(e.level, e.x, e.y);
-        break;
-      case "angel-gone":
-        s.setAngelGone();
-        break;
-      case "nudge-dialogue":
-        s.nudgeDialogue();
-        break;
-      default:
-        break;
-    }
-  });
-}
