@@ -7,22 +7,36 @@ let currentBed = -1;
 let musicOn = true;
 let sfxOn = true;
 let visibilityBound = false;
+let visibilityHandler: (() => void) | null = null;
 let hushToken = 0;
 let hushTimer: number | null = null;
 
 function ctxNow() { return bus?.ctx.currentTime ?? 0; }
 
 export function unlockAudio() {
-  if (!bus) {
-    const ctx = new AudioContext({ latencyHint: "interactive" });
-    const master = ctx.createGain(); const music = ctx.createGain(); const sfx = ctx.createGain();
-    music.gain.value = musicOn ? 0.22 : 0; sfx.gain.value = sfxOn ? 0.4 : 0; master.gain.value = 0.85;
-    music.connect(master); sfx.connect(master); master.connect(ctx.destination); bus = { ctx, master, music, sfx };
-  }
-  if (bus.ctx.state === "suspended") void bus.ctx.resume();
-  if (!visibilityBound) {
-    visibilityBound = true;
-    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && bus?.ctx.state === "suspended") void bus.ctx.resume(); });
+  try {
+    if (!bus) {
+      const AudioContextCtor = window.AudioContext ?? (window as Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!AudioContextCtor) return false;
+      const ctx = new AudioContextCtor({ latencyHint: "interactive" });
+      const master = ctx.createGain(); const music = ctx.createGain(); const sfx = ctx.createGain();
+      music.gain.value = musicOn ? 0.22 : 0; sfx.gain.value = sfxOn ? 0.4 : 0; master.gain.value = 0.85;
+      music.connect(master); sfx.connect(master); master.connect(ctx.destination); bus = { ctx, master, music, sfx };
+    }
+    if (bus.ctx.state === "suspended") void bus.ctx.resume().catch(() => undefined);
+    if (!visibilityBound) {
+      visibilityBound = true;
+      visibilityHandler = () => {
+        if (document.visibilityState === "visible" && bus?.ctx.state === "suspended") {
+          void bus.ctx.resume().catch(() => undefined);
+        }
+      };
+      document.addEventListener("visibilitychange", visibilityHandler);
+    }
+    return true;
+  } catch (error) {
+    console.warn("[Fluttershy.EXE] Audio unavailable:", error);
+    return false;
   }
 }
 
@@ -38,27 +52,33 @@ function stopMusic() {
 
 function tone(dest: GainNode, type: OscillatorType, freq: number, dur: number, gain = 0.08, at = 0) {
   if (!bus) return;
-  const t0 = bus.ctx.currentTime + at; const osc = bus.ctx.createOscillator(); const g = bus.ctx.createGain(); const f = bus.ctx.createBiquadFilter();
-  osc.type = type; osc.frequency.setValueAtTime(freq, t0); f.type = "lowpass"; f.frequency.value = 1400;
-  g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(gain, t0 + 0.04); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-  osc.connect(f); f.connect(g); g.connect(dest); osc.start(t0); osc.stop(t0 + dur + 0.05); osc.onended = () => { osc.disconnect(); f.disconnect(); g.disconnect(); };
+  try {
+    const t0 = bus.ctx.currentTime + at; const osc = bus.ctx.createOscillator(); const g = bus.ctx.createGain(); const f = bus.ctx.createBiquadFilter();
+    osc.type = type; osc.frequency.setValueAtTime(freq, t0); f.type = "lowpass"; f.frequency.value = 1400;
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(gain, t0 + 0.04); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(f); f.connect(g); g.connect(dest); osc.start(t0); osc.stop(t0 + dur + 0.05); osc.onended = () => { try { osc.disconnect(); f.disconnect(); g.disconnect(); } catch { /* already ended */ } };
+  } catch { /* audio must never break gameplay */ }
 }
 
 function noiseBurst(dest: GainNode, dur: number, gain = 0.05, at = 0) {
   if (!bus) return;
-  const t0 = bus.ctx.currentTime + at; const len = Math.floor(bus.ctx.sampleRate * dur); const buffer = bus.ctx.createBuffer(1, len, bus.ctx.sampleRate); const data = buffer.getChannelData(0);
-  for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
-  const src = bus.ctx.createBufferSource(); const g = bus.ctx.createGain(); const f = bus.ctx.createBiquadFilter(); src.buffer = buffer; f.type = "bandpass"; f.frequency.value = 900;
-  g.gain.setValueAtTime(gain, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur); src.connect(f); f.connect(g); g.connect(dest); src.start(t0); src.stop(t0 + dur);
+  try {
+    const t0 = bus.ctx.currentTime + at; const len = Math.floor(bus.ctx.sampleRate * dur); const buffer = bus.ctx.createBuffer(1, len, bus.ctx.sampleRate); const data = buffer.getChannelData(0);
+    for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+    const src = bus.ctx.createBufferSource(); const g = bus.ctx.createGain(); const f = bus.ctx.createBiquadFilter(); src.buffer = buffer; f.type = "bandpass"; f.frequency.value = 900;
+    g.gain.setValueAtTime(gain, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur); src.connect(f); f.connect(g); g.connect(dest); src.start(t0); src.stop(t0 + dur);
+  } catch { /* audio must never break gameplay */ }
 }
 
 function filteredNoise(dest: GainNode, dur: number, gain: number, frequency: number, at = 0) {
   if (!bus) return;
-  const t0 = bus.ctx.currentTime + at; const len = Math.max(1, Math.floor(bus.ctx.sampleRate * dur)); const buffer = bus.ctx.createBuffer(1, len, bus.ctx.sampleRate); const data = buffer.getChannelData(0); let last = 0;
-  for (let i = 0; i < len; i++) { last = last * 0.82 + (Math.random() * 2 - 1) * 0.18; data[i] = last; }
-  const src = bus.ctx.createBufferSource(); const f = bus.ctx.createBiquadFilter(); const g = bus.ctx.createGain(); src.buffer = buffer; f.type = "bandpass"; f.frequency.value = frequency; f.Q.value = 0.8;
-  g.gain.setValueAtTime(0.0001, t0); g.gain.linearRampToValueAtTime(gain, t0 + Math.min(0.08, dur * 0.25)); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-  src.connect(f); f.connect(g); g.connect(dest); src.start(t0); src.stop(t0 + dur + 0.03);
+  try {
+    const t0 = bus.ctx.currentTime + at; const len = Math.max(1, Math.floor(bus.ctx.sampleRate * dur)); const buffer = bus.ctx.createBuffer(1, len, bus.ctx.sampleRate); const data = buffer.getChannelData(0); let last = 0;
+    for (let i = 0; i < len; i++) { last = last * 0.82 + (Math.random() * 2 - 1) * 0.18; data[i] = last; }
+    const src = bus.ctx.createBufferSource(); const f = bus.ctx.createBiquadFilter(); const g = bus.ctx.createGain(); src.buffer = buffer; f.type = "bandpass"; f.frequency.value = frequency; f.Q.value = 0.8;
+    g.gain.setValueAtTime(0.0001, t0); g.gain.linearRampToValueAtTime(gain, t0 + Math.min(0.08, dur * 0.25)); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    src.connect(f); f.connect(g); g.connect(dest); src.start(t0); src.stop(t0 + dur + 0.03);
+  } catch { /* audio must never break gameplay */ }
 }
 
 function organicHorror(kind: "knock" | "rustle" | "steps" | "breath" | "snap" | "drone" | "sting" | "heartbeat" | "impact" | "scream") {
