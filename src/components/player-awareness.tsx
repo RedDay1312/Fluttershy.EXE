@@ -42,6 +42,28 @@ const EN_LATE = [
   "You came back to see if I'd get worse.",
 ];
 
+const RU_IDLE = [
+  "Почему ты стоишь?",
+  "Ты ждёшь, пока я что-нибудь сделаю?",
+  "Я тоже жду.",
+];
+const EN_IDLE = [
+  "Why are you standing there?",
+  "Are you waiting for me to do something?",
+  "I'm waiting too.",
+];
+
+const RU_IDLE_LATE = [
+  "Ты перестал двигаться. Я знаю почему.",
+  "Можешь не двигаться. Я всё равно тебя вижу.",
+  "Не притворяйся, что меня здесь нет.",
+];
+const EN_IDLE_LATE = [
+  "You stopped moving. I know why.",
+  "You don't have to move. I can still see you.",
+  "Don't pretend I'm not here.",
+];
+
 function pick(list: string[], seed: number) {
   return list[Math.abs(seed) % list.length] ?? list[0] ?? "";
 }
@@ -58,6 +80,7 @@ export function PlayerAwareness() {
   const [visible, setVisible] = useState(false);
   const seedRef = useRef(0);
   const pausedAtRef = useRef(0);
+  const lastActivityRef = useRef(Date.now());
 
   const horrorStage = Math.max(
     hauntStage,
@@ -72,6 +95,18 @@ export function PlayerAwareness() {
     if (horrorStage >= 2) return lang === "ru" ? RU_MID : EN_MID;
     return lang === "ru" ? RU_EARLY : EN_EARLY;
   }, [horrorStage, lang]);
+
+  useEffect(() => {
+    const markActive = () => {
+      lastActivityRef.current = Date.now();
+    };
+    window.addEventListener("pointermove", markActive, { passive: true });
+    window.addEventListener("keydown", markActive);
+    return () => {
+      window.removeEventListener("pointermove", markActive);
+      window.removeEventListener("keydown", markActive);
+    };
+  }, []);
 
   useEffect(() => {
     if (phase !== "paused") {
@@ -108,6 +143,25 @@ export function PlayerAwareness() {
   }, [phase, pool, level, deaths, closeAttempts, horrorStage]);
 
   useEffect(() => {
+    if (phase !== "playing") return;
+    const interval = window.setInterval(() => {
+      const idleMs = Date.now() - lastActivityRef.current;
+      const threshold = horrorStage >= 4 ? 18000 : horrorStage >= 2 ? 28000 : 42000;
+      if (idleMs < threshold || visible) return;
+      if (Math.random() > 0.34) return;
+      const idlePool = horrorStage >= 4
+        ? lang === "ru" ? RU_IDLE_LATE : EN_IDLE_LATE
+        : lang === "ru" ? RU_IDLE : EN_IDLE;
+      seedRef.current += 1;
+      setText(pick(idlePool, seedRef.current + level));
+      setVisible(true);
+      playSfx("whisper");
+      window.setTimeout(() => setVisible(false), horrorStage >= 4 ? 5000 : 3600);
+    }, 5000);
+    return () => window.clearInterval(interval);
+  }, [phase, horrorStage, lang, level, visible]);
+
+  useEffect(() => {
     if (!visible || phase !== "paused") return;
     const onPointer = () => {
       if (horrorStage < 4) return;
@@ -118,10 +172,10 @@ export function PlayerAwareness() {
     return () => window.removeEventListener("pointermove", onPointer);
   }, [visible, phase, horrorStage, lang]);
 
-  if (phase !== "paused" || !visible || !text) return null;
+  if (!visible || !text || phase === "ending") return null;
 
   return (
-    <div className={"player-awareness " + (horrorStage >= 4 ? "is-terrifying" : horrorStage >= 2 ? "is-aware" : "")}>
+    <div className={"player-awareness " + (horrorStage >= 4 ? "is-terrifying" : horrorStage >= 2 ? "is-aware" : "") + (phase === "playing" ? " is-idle" : "")}>
       <div className="player-awareness__dot" />
       <div className="player-awareness__label">{t(lang, "app.title")} // 0xUSER</div>
       <p>{text}</p>
