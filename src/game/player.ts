@@ -138,18 +138,22 @@ export class Pony {
     this.sprite.play("fs-look-anim", true);
     this.onLook?.();
     this.sprite.scene.time.delayedCall(ms, () => {
-      if (this.dead) return;
+      if (!this.sprite.scene.scene.isActive() || this.dead) return;
       this.looking = false;
       this.lock(false);
     });
   }
 
   hurt() {
-    if (this.hurtT > 0 || this.dead || this.invulnerableMs > 0) return;
+    // Death is marked before the hurt animation is requested by PlayScene.
+    // Do not reject the visual damage feedback just because dead=true.
+    if (this.hurtT > 0 || this.invulnerableMs > 0) return;
     this.hurtT = 420;
     this.sprite.play("fs-hurt-anim", true);
     this.sprite.setTint(0xff8888);
-    this.sprite.scene.time.delayedCall(180, () => this.sprite.clearTint());
+    this.sprite.scene.time.delayedCall(180, () => {
+      if (this.sprite.scene.scene.isActive()) this.sprite.clearTint();
+    });
   }
 
   respawn(x: number, y: number) {
