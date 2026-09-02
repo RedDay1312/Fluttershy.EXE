@@ -5,6 +5,7 @@ import { PlayerAwareness } from "@/components/player-awareness";
 import { DeathReactions } from "@/components/death-reactions";
 import { DesktopHub } from "@/components/desktop-hub";
 import appCss from "../styles.css?url";
+import finishPassCss from "../game-finish-pass.css?url";
 import bootCss from "../boot-screen.css?url";
 import menuCss from "../main-menu.css?url";
 import pauseCss from "../pause-menu.css?url";
@@ -13,7 +14,7 @@ import deathCss from "../death-reactions.css?url";
 import desktopHubCss from "../desktop-hub.css?url";
 import browserShortcutCss from "../browser-shortcut.css?url";
 
-const APP_NAME = "WAITING";
+const APP_NAME = "FLUTTERSHY.EXE";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -21,7 +22,7 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: APP_NAME },
-      { name: "theme-color", content: "#07070A" },
+      { name: "theme-color", content: "#070A08" },
       {
         name: "description",
         content: "A gentle yellow pegasus found a game about herself. She knows you are outside it.",
@@ -30,6 +31,7 @@ export const Route = createRootRoute({
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "stylesheet", href: appCss },
+      { rel: "stylesheet", href: finishPassCss },
       { rel: "stylesheet", href: bootCss },
       { rel: "stylesheet", href: menuCss },
       { rel: "stylesheet", href: pauseCss },
