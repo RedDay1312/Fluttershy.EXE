@@ -20,8 +20,8 @@ export function installControlsTest(getPony: () => Pony | null) {
       setInjectedKeys(codes);
     },
     setSteer: (v: number) => {
-      if (v > 0.2) setInjectedKeys(["KeyA"]);
-      else if (v < -0.2) setInjectedKeys(["KeyD"]);
+      if (v < -0.2) setInjectedKeys(["KeyA"]);
+      else if (v > 0.2) setInjectedKeys(["KeyD"]);
       else setInjectedKeys([]);
     },
   };
