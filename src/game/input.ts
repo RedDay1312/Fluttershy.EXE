@@ -39,6 +39,11 @@ function resetEdges() {
   prevInteract = false;
 }
 
+function clearPhysicalInput() {
+  held.clear();
+  resetEdges();
+}
+
 export function installInput(target: Window | Document = window) {
   const down = (e: KeyboardEvent) => {
     if (GAME_CODES.has(e.code)) e.preventDefault();
@@ -48,12 +53,18 @@ export function installInput(target: Window | Document = window) {
     held.delete(e.code);
   };
   const clear = () => {
-    held.clear();
-    resetEdges();
+    clearPhysicalInput();
   };
   const visibility = () => {
-    if (document.hidden) clear();
-    else resetEdges();
+    // Browsers may omit keyup when a tab/window loses focus. Clear both
+    // physical and injected controls so movement cannot remain stuck.
+    if (document.hidden) {
+      held.clear();
+      injected = null;
+      resetEdges();
+    } else {
+      clearPhysicalInput();
+    }
   };
   target.addEventListener("keydown", down as EventListener);
   target.addEventListener("keyup", up as EventListener);
