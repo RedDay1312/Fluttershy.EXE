@@ -110,6 +110,7 @@ function findCheckpointSupport(c: { x: number; y: number }, platforms: Plat[]) {
   return platforms
     .filter((p) => p.w >= 70 && c.x >= p.x + 24 && c.x <= p.x + p.w - 24)
     .map((p) => ({ p, distance: Math.abs((p.y - 104) - c.y) }))
+    .filter(({ distance }) => distance <= 150)
     .sort((a, b) => a.distance - b.distance)[0]?.p;
 }
 
