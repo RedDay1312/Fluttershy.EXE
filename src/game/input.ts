@@ -12,6 +12,7 @@ let injected: string[] | null = null;
 let prevJump = false;
 let prevPause = false;
 let prevInteract = false;
+let installedCleanup: (() => void) | null = null;
 
 const GAME_CODES = new Set([
   "ArrowLeft",
@@ -45,6 +46,12 @@ function clearPhysicalInput() {
 }
 
 export function installInput(target: Window | Document = window) {
+  // Re-installing input must not stack another set of global listeners.
+  // This matters when the game scene is recreated or hot-reloaded.
+  installedCleanup?.();
+  installedCleanup = null;
+  clearInput();
+
   const down = (e: KeyboardEvent) => {
     if (GAME_CODES.has(e.code)) e.preventDefault();
     held.add(e.code);
@@ -66,18 +73,24 @@ export function installInput(target: Window | Document = window) {
       clearPhysicalInput();
     }
   };
+
   target.addEventListener("keydown", down as EventListener);
   target.addEventListener("keyup", up as EventListener);
   window.addEventListener("blur", clear);
   window.addEventListener("focus", resetEdges);
   document.addEventListener("visibilitychange", visibility);
-  return () => {
+
+  const cleanup = () => {
     target.removeEventListener("keydown", down as EventListener);
     target.removeEventListener("keyup", up as EventListener);
     window.removeEventListener("blur", clear);
     window.removeEventListener("focus", resetEdges);
     document.removeEventListener("visibilitychange", visibility);
+    clearInput();
+    if (installedCleanup === cleanup) installedCleanup = null;
   };
+  installedCleanup = cleanup;
+  return cleanup;
 }
 
 export function setInjectedKeys(codes: string[] | null) {
