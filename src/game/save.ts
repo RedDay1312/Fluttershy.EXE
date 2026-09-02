@@ -60,12 +60,13 @@ function normalize(raw: Partial<SaveData>): SaveData {
           y: raw.checkpoint.y,
         }
       : null;
+  const lang: Lang = raw.lang === "en" ? "en" : "ru";
 
   return {
     ...base,
     ...raw,
     version: SAVE_VERSION,
-    lang: "ru",
+    lang,
     level,
     notes: Array.isArray(raw.notes) ? [...new Set(raw.notes.filter((v): v is string => typeof v === "string"))] : [],
     butterflies: Number.isFinite(raw.butterflies) ? Math.max(0, Math.floor(raw.butterflies!)) : base.butterflies,
@@ -83,7 +84,6 @@ export function loadSave(): SaveData {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) {
-      // Remove abandoned pre-v4 slots so they can never leak into a fresh campaign.
       for (const legacyKey of LEGACY_KEYS) localStorage.removeItem(legacyKey);
       return defaultSave();
     }
@@ -95,7 +95,7 @@ export function loadSave(): SaveData {
 
 export function writeSave(data: SaveData) {
   try {
-    localStorage.setItem(KEY, JSON.stringify({ ...normalize(data), version: SAVE_VERSION, lang: "ru" }));
+    localStorage.setItem(KEY, JSON.stringify(normalize(data)));
   } catch {
     /* private mode */
   }
