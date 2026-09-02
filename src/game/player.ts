@@ -15,7 +15,6 @@ const MAX_SPEED = 310;
 const CUT = 0.48;
 const WALL_JUMP = -780;
 const RESPAWN_INVULN = 1250;
-const VISUAL_BASE = 112;
 
 export class Pony {
   sprite: Phaser.Physics.Arcade.Sprite;
@@ -37,12 +36,11 @@ export class Pony {
   onJump?: () => void;
   onLook?: () => void;
   private feedbackTween?: Phaser.Tweens.Tween;
-  private landingKick = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     this.sprite = scene.physics.add.sprite(x, y, "fs-idle", 0);
     this.sprite.setDepth(20);
-    this.sprite.setDisplaySize(VISUAL_BASE, VISUAL_BASE);
+    this.sprite.setDisplaySize(112, 112);
     this.sprite.setSize(48, 38);
     this.sprite.setOffset(40, 78);
     this.sprite.setMaxVelocity(MAX_SPEED, MAX_FALL);
@@ -160,7 +158,8 @@ export class Pony {
   respawn(x: number, y: number) {
     const safe = this.findSafeRespawn(this.sprite.scene, x, y);
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
-    this.killFeedbackTween();
+    this.feedbackTween?.stop();
+    this.feedbackTween = undefined;
     this.dead = false;
     this.hurtT = 0;
     this.looking = false;
@@ -172,7 +171,6 @@ export class Pony {
     this.wasGrounded = false;
     this.invulnerableMs = RESPAWN_INVULN;
     this.jumpHeldPrev = false;
-    this.landingKick = 0;
     this.sprite.setPosition(safe.x, safe.y);
     body.reset(safe.x, safe.y);
     body.setEnable(true);
@@ -200,7 +198,6 @@ export class Pony {
     } else if (this.sprite.alpha !== 1) {
       this.sprite.setAlpha(1);
     }
-    this.landingKick = Math.max(0, this.landingKick - ms);
 
     if (this.locked || this.dead) {
       body.setVelocityX(0);
@@ -274,7 +271,7 @@ export class Pony {
   }
 
   private playJumpFeedback() {
-    this.killFeedbackTween();
+    this.feedbackTween?.stop();
     this.sprite.setScale(0.91, 1.08);
     this.feedbackTween = this.sprite.scene.tweens.add({
       targets: this.sprite,
@@ -286,8 +283,7 @@ export class Pony {
   }
 
   private playLandingFeedback() {
-    this.killFeedbackTween();
-    this.landingKick = 120;
+    this.feedbackTween?.stop();
     this.sprite.setScale(1.1, 0.9);
     this.feedbackTween = this.sprite.scene.tweens.add({
       targets: this.sprite,
@@ -296,11 +292,6 @@ export class Pony {
       duration: 180,
       ease: "Back.easeOut",
     });
-  }
-
-  private killFeedbackTween() {
-    this.feedbackTween?.stop();
-    this.feedbackTween = undefined;
   }
 
   private animate(onGround: boolean, vx: number, vy: number) {
