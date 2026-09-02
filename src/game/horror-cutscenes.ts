@@ -5,6 +5,7 @@ import { playHorrorSfx, playSfx } from "./audio";
 let active = false;
 let lastScene = -1;
 let sceneTimer: number | null = null;
+let kickoffTimer: number | null = null;
 let keyHandler: ((e: KeyboardEvent) => void) | null = null;
 let timers = new Set<number>();
 
@@ -39,6 +40,11 @@ function cleanupInput() {
   if (sceneTimer !== null) {
     window.clearTimeout(sceneTimer);
     sceneTimer = null;
+  }
+  if (kickoffTimer !== null) {
+    window.clearTimeout(kickoffTimer);
+    timers.delete(kickoffTimer);
+    kickoffTimer = null;
   }
 }
 
@@ -104,6 +110,7 @@ function runCutscene(level: number) {
   document.body.appendChild(root);
 
   requestAnimationFrame(() => {
+    if (!active || !root.isConnected) return;
     root.style.opacity = "1";
     topBar.style.transform = "scaleY(1)";
     bottomBar.style.transform = "scaleY(1)";
@@ -121,15 +128,13 @@ function runCutscene(level: number) {
   if (level >= 5) later(() => playHorrorSfx("steps"), 900);
   if (level >= 6) later(() => playSfx("stinger"), 2400);
 
-  // Later scenes make the image approach the viewer, then abruptly disappear.
-  // This keeps the reveal restrained instead of turning every cutscene into a jumpscare.
   if (scene.image && level >= 3) {
     later(() => {
-      if (!active) return;
+      if (!active || !root.isConnected) return;
       pony.style.filter = "contrast(2) brightness(.18) saturate(0) drop-shadow(0 0 45px rgba(255,255,255,.18))";
       pony.style.transform = "translate(-50%,-50%) scale(1.18) rotate(-2deg)";
       playHorrorSfx("snap");
-      later(() => { if (active) { pony.style.opacity = "0"; film.style.background = "#000"; } }, 95);
+      later(() => { if (active && root.isConnected) { pony.style.opacity = "0"; film.style.background = "#000"; } }, 95);
     }, Math.max(1500, scene.duration - 1450));
   }
 
@@ -154,7 +159,13 @@ function runCutscene(level: number) {
 }
 
 bridge.on((e) => {
-  if (e.type === "level-clear") window.setTimeout(() => runCutscene(e.level), 520);
+  if (e.type === "level-clear") {
+    if (kickoffTimer !== null) window.clearTimeout(kickoffTimer);
+    kickoffTimer = later(() => {
+      kickoffTimer = null;
+      runCutscene(e.level);
+    }, 520);
+  }
 });
 
 export function resetCutscenes() {
@@ -163,5 +174,7 @@ export function resetCutscenes() {
   timers.clear();
   lastScene = -1;
   active = false;
-  document.querySelectorAll("[data-fluttershy-cutscene]").forEach((node) => node.remove());
+  if (typeof document !== "undefined") {
+    document.querySelectorAll("[data-fluttershy-cutscene]").forEach((node) => node.remove());
+  }
 }
