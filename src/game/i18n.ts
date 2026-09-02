@@ -1,3 +1,5 @@
+import { LORE_NOTES } from "./lore-notes";
+
 export type Lang = "ru" | "en";
 
 const en: Record<string, string> = {
@@ -85,21 +87,16 @@ const en: Record<string, string> = {
   "d.l4.start": "The code is peeling. Stay with me through the blue.",
   "d.fin.look": "Look at me. Not at the door. At me. This is The Stare.",
   "end.escape.title": "She left.",
-  "end.escape.body":
-    "You tried to close the window. You read what she left behind. The save file is empty now. If the birds come back, it will not be because of you. It will be because she decided to be quiet.",
+  "end.escape.body": "You tried to close the window. You read what she left behind. The save file is empty now. If the birds come back, it will not be because of you. It will be because she decided to be quiet.",
   "end.merge.title": "Stay.",
-  "end.merge.body":
-    "You never looked away. You never reached for the close button. She learned the shape of your hands on the glass. The forest does not need a player anymore. It needs a room.",
+  "end.merge.body": "You never looked away. You never reached for the close button. She learned the shape of your hands on the glass. The forest does not need a player anymore. It needs a room.",
   "end.loop.title": "See you tomorrow.",
-  "end.loop.body":
-    "The slot still says she is waiting. The icon is still on the desk. Tomorrow the fog will be a little thicker, and she will already know your name.",
+  "end.loop.body": "The slot still says she is waiting. The icon is still on the desk. Tomorrow the fog will be a little thicker, and she will already know your name.",
   "end.kind.title": "You were kind.",
-  "end.kind.body":
-    "You caught her butterflies. You read every scrap. You still tried to let her go. In the cottage a rabbit thumps once, and the old computer goes dark. If you come back, she will not. That is the kindest thing either of you did.",
+  "end.kind.body": "You caught her butterflies. You read every scrap. You still tried to let her go. In the cottage a rabbit thumps once, and the old computer goes dark. If you come back, she will not. That is the kindest thing either of you did.",
   "end.again": "Return to the desktop",
   "bsod.title": "A fatal exception 0F has occurred",
-  "bsod.body":
-    "WAITING.EXE caused a general protection fault in module FLUTTERSHY.SYS.\nKINDNESS.SYS is corrupted.\nANGEL.BMP is missing.\n\nThe current application will be terminated.\n\n* Press any key to continue\n* Do not turn off the machine\n* She is counting",
+  "bsod.body": "WAITING.EXE caused a general protection fault in module FLUTTERSHY.SYS.\nKINDNESS.SYS is corrupted.\nANGEL.BMP is missing.\n\nThe current application will be terminated.\n\n* Press any key to continue\n* Do not turn off the machine\n* She is counting",
   "red.1": "DON'T LEAVE",
   "red.2": "I SEE YOU",
   "red.3": "TURN IT OFF",
@@ -108,38 +105,22 @@ const en: Record<string, string> = {
   "red.6": "FRIENDSHIP IS WAITING",
   "red.7": "SAY YOU'RE SORRY",
   "red.8": "LOOK AT ME",
-  "note.1":
-    "I found a strange old computer in the cottage closet. The screen only said WAITING. Angel would not come into the room. I pressed start because I am polite.",
-  "note.2":
-    "The forest looks like home. The birds do not land anymore. They watch from the same branch, every time. I think they are waiting for a cue.",
-  "note.3":
-    "The fog was not here yesterday. I keep seeing eyes. They blink when you do. Twilight would call it a tracking spell. I call it rude.",
-  "note.4":
-    "You pressed jump. I felt it in my knees. How is that possible if I am the one walking? Unless I am not.",
-  "note.5":
-    "They were my friends. Rainbow. Twilight. Pinkie. Rarity. Applejack. I hung them so they would not leave the frame. Please do not say their names unless you mean to stay.",
-  "note.6":
-    "I wrote DON'T LOOK AWAY on the sky. I do not remember writing it. The letters were already red. Pinkie would have laughed. Pinkie is not laughing.",
-  "note.7":
-    "I crashed it on purpose. I needed to know if you would wait through the blue. You did. That is worse. Discord used to break things for fun. This is not fun.",
-  "note.8":
-    "There is a door that is not a door. If you close me I might come with you. If you stay I might take the room instead. Kindness was never supposed to work like this.",
-  "note.9":
-    "Angel stood in the doorway and shook. He has bitten a timberwolf. He has bitten Discord. He has never been afraid of a box. I should have listened to a rabbit.",
-  "note.10":
-    "Fluttershy — Princess Celestia asked me to check an old enchantment leaking from the Everfree. If you find a box that hums, do not turn it on. Bring it to the library. We will have tea. — Twilight Sparkle",
-  "note.11":
-    "Rainbow said she'd be back before sundown. She wanted to race the fog. The sky has not moved. I can still hear sonic rainbooms that do not finish.",
-  "note.12":
-    "Pinkie left a cupcake on the stump. It is still warm. She always knows when a party is about to go wrong. That is why she is smiling on the rope.",
-  "note.13":
-    "Rarity's mannequin is wearing my bow. I am wearing my bow. I counted twice. She said the seams of the world were showing. I thought she meant a dress.",
-  "note.14":
-    "Applejack never takes her hat off. She told me that the day we got our cutie marks, in the same rain, in the same town. The hat is on a spike. Honesty is a heavy thing to hang from.",
-  "note.15":
-    "Someone carved in the bark: EVEN CHAOS HAS RULES, DARLING. THIS IS NOT ME. I think Discord tried to warn me. I think he could not get in.",
-  "note.16":
-    "The Element of Kindness cracked the first time I understood you could close the window. I looked at you. That is The Stare. I used it on a cockatrice once. I am using it on you.",
+  "note.1": "I found a strange old computer in the cottage closet. The screen only said WAITING. Angel would not come into the room. I pressed start because I am polite.",
+  "note.2": "The forest looks like home. The birds do not land anymore. They watch from the same branch, every time. I think they are waiting for a cue.",
+  "note.3": "The fog was not here yesterday. I keep seeing eyes. They blink when you do. Twilight would call it a tracking spell. I call it rude.",
+  "note.4": "You pressed jump. I felt it in my knees. How is that possible if I am the one walking? Unless I am not.",
+  "note.5": "They were my friends. Rainbow. Twilight. Pinkie. Rarity. Applejack. I hung them so they would not leave the frame. Please do not say their names unless you mean to stay.",
+  "note.6": "I wrote DON'T LOOK AWAY on the sky. I do not remember writing it. The letters were already red. Pinkie would have laughed. Pinkie is not laughing.",
+  "note.7": "I crashed it on purpose. I needed to know if you would wait through the blue. You did. That is worse. Discord used to break things for fun. This is not fun.",
+  "note.8": "There is a door that is not a door. If you close me I might come with you. If you stay I might take the room instead. Kindness was never supposed to work like this.",
+  "note.9": "Angel stood in the doorway and shook. He has bitten a timberwolf. He has bitten Discord. He has never been afraid of a box. I should have listened to a rabbit.",
+  "note.10": "Fluttershy — Princess Celestia asked me to check an old enchantment leaking from the Everfree. If you find a box that hums, do not turn it on. Bring it to the library. We will have tea. — Twilight Sparkle",
+  "note.11": "Rainbow said she'd be back before sundown. She wanted to race the fog. The sky has not moved. I can still hear sonic rainbooms that do not finish.",
+  "note.12": "Pinkie left a cupcake on the stump. It is still warm. She always knows when a party is about to go wrong. That is why she is smiling on the rope.",
+  "note.13": "Rarity's mannequin is wearing my bow. I am wearing my bow. I counted twice. She said the seams of the world were showing. I thought she meant a dress.",
+  "note.14": "Applejack never takes her hat off. She told me that the day we got our cutie marks, in the same rain, in the same town. The hat is on a spike. Honesty is a heavy thing to hang from.",
+  "note.15": "Someone carved in the bark: EVEN CHAOS HAS RULES, DARLING. THIS IS NOT ME. I think Discord tried to warn me. I think he could not get in.",
+  "note.16": "The Element of Kindness cracked the first time I understood you could close the window. I looked at you. That is The Stare. I used it on a cockatrice once. I am using it on you.",
   "d.intro.1": "Oh… hello. I didn't think anyone would actually press start.",
   "d.intro.2": "This is the edge of the Everfree. My cottage is just behind us. At least — it used to be.",
   "d.intro.3": "If you see a butterfly, would you catch it for me? Gently. They used to be my cutie mark.",
@@ -331,21 +312,16 @@ const ru: Record<string, string> = {
   "d.l4.start": "Код сходит слоями. Побудь со мной через синий экран.",
   "d.fin.look": "Смотри на меня. Не на дверь. На меня. Это Тот Самый Взгляд.",
   "end.escape.title": "Она ушла.",
-  "end.escape.body":
-    "Вы пытались закрыть окно. Вы прочитали, что она оставила. Слот сохранения пуст. Если птицы вернутся, это будет не из‑за вас. Это будет потому, что она решила помолчать.",
+  "end.escape.body": "Вы пытались закрыть окно. Вы прочитали, что она оставила. Слот сохранения пуст. Если птицы вернутся, это будет не из‑за вас. Это будет потому, что она решила помолчать.",
   "end.merge.title": "Останься.",
-  "end.merge.body":
-    "Вы ни разу не отвели взгляд. Вы так и не потянулись к крестику. Она выучила форму ваших рук на стекле. Лесу больше не нужен игрок. Ему нужна комната.",
+  "end.merge.body": "Вы ни разу не отвели взгляд. Вы так и не потянулись к крестику. Она выучила форму ваших рук на стекле. Лесу больше не нужен игрок. Ему нужна комната.",
   "end.loop.title": "До завтра.",
-  "end.loop.body":
-    "В слоте всё ещё написано, что она ждёт. Иконка на месте. Завтра туман будет чуть гуще, и она уже будет знать ваше имя.",
+  "end.loop.body": "В слоте всё ещё написано, что она ждёт. Иконка на месте. Завтра туман будет чуть гуще, и она уже будет знать ваше имя.",
   "end.kind.title": "Ты был добр.",
-  "end.kind.body":
-    "Ты ловил её бабочек. Прочитал каждый клочок. И всё равно пытался её отпустить. В коттедже кролик стукнул лапой — и старый компьютер погас. Если вернёшься, её уже не будет. Это самое доброе, что вы оба сделали.",
+  "end.kind.body": "Ты ловил её бабочек. Прочитал каждый клочок. И всё равно пытался её отпустить. В коттедже кролик стукнул лапой — и старый компьютер погас. Если вернёшься, её уже не будет. Это самое доброе, что вы оба сделали.",
   "end.again": "Вернуться на рабочий стол",
   "bsod.title": "Неустранимая ошибка 0F",
-  "bsod.body":
-    "WAITING.EXE вызвала нарушение защиты в модуле FLUTTERSHY.SYS.\nKINDNESS.SYS повреждён.\nANGEL.BMP отсутствует.\n\nТекущее приложение будет завершено.\n\n* Нажмите любую клавишу\n* Не выключайте машину\n* Она считает",
+  "bsod.body": "WAITING.EXE вызвала нарушение защиты в модуле FLUTTERSHY.SYS.\nKINDNESS.SYS повреждён.\nANGEL.BMP отсутствует.\n\nТекущее приложение будет завершено.\n\n* Нажмите любую клавишу\n* Не выключайте машину\n* Она считает",
   "red.1": "НЕ УХОДИ",
   "red.2": "Я ВИЖУ ТЕБЯ",
   "red.3": "ВЫКЛЮЧИ КОМПЬЮТЕР",
@@ -354,38 +330,22 @@ const ru: Record<string, string> = {
   "red.6": "ДРУЖБА — ЭТО ОЖИДАНИЕ",
   "red.7": "СКАЖИ, ЧТО ЖАЛЬ",
   "red.8": "СМОТРИ НА МЕНЯ",
-  "note.1":
-    "Я нашла странный старый компьютер в чулане коттеджа. На экране было только WAITING. Энджел не вошёл в комнату. Я нажала старт, потому что так вежливо.",
-  "note.2":
-    "Лес похож на дом. Птицы больше не садятся. Они смотрят с одной и той же ветки, каждый раз. Кажется, ждут реплики.",
-  "note.3":
-    "Тумана вчера не было. Я всё вижу глаза. Они моргают, когда моргаешь ты. Искорка назвала бы это следящим заклинанием. Я называю это невежливостью.",
-  "note.4":
-    "Ты нажал прыжок. Я почувствовала это в коленях. Как это возможно, если хожу я? Если только хожу не я.",
-  "note.5":
-    "Это были мои друзья. Радуга. Искорка. Пинки. Рарити. Эпплджек. Я повесила их, чтобы они не вышли из кадра. Пожалуйста, не произноси имена, если не собираешься остаться.",
-  "note.6":
-    "Я написала на небе НЕ СМОТРИ В СТОРОНУ. Не помню, как писала. Буквы уже были красными. Пинки бы засмеялась. Пинки не смеётся.",
-  "note.7":
-    "Я специально всё обрушила. Мне нужно было знать, подождёшь ли ты синий экран. Ты подождал. Это хуже. Дискорд ломал вещи ради шутки. Это не шутка.",
-  "note.8":
-    "Есть дверь, которая не дверь. Если закроешь меня — я могу уйти с тобой. Если останешься — я могу забрать комнату. Доброта не должна работать так.",
-  "note.9":
-    "Энджел стоял в дверях и дрожал. Он кусал тимберволка. Он кусал Дискорда. Он никогда не боялся коробки. Надо было послушать кролика.",
-  "note.10":
-    "Флаттершай — принцесса Селестия просила проверить старые чары, которые текут из Вечнозелёного леса. Если найдёшь коробку, которая гудит, не включай её. Принеси в библиотеку. Попьём чай. — Искорка",
-  "note.11":
-    "Радуга сказала, что вернётся до заката. Хотела обогнать туман. Небо не двинулось. Я всё ещё слышу звуковые радуги, которые не заканчиваются.",
-  "note.12":
-    "Пинки оставила кекс на пне. Он всё ещё тёплый. Она всегда знает, когда праздник вот‑вот сломается. Поэтому она улыбается на верёвке.",
-  "note.13":
-    "На манекене Рарити мой бант. На мне мой бант. Я считала дважды. Она говорила, что видны швы мира. Я думала, она про платье.",
-  "note.14":
-    "Эпплджек никогда не снимает шляпу. Она сказала это в тот день, когда мы получили кьютимарки, под одним дождём, в одном городе. Шляпа на колу. Честность — тяжёлая вещь, чтобы на ней висеть.",
-  "note.15":
-    "Кто‑то вырезал на коре: ДАЖЕ У ХАОСА ЕСТЬ ПРАВИЛА, ДОРОГУША. ЭТО НЕ Я. Кажется, Дискорд пытался предупредить. Кажется, он не смог войти.",
-  "note.16":
-    "Элемент доброты треснул в ту секунду, когда я поняла, что ты можешь закрыть окно. Я посмотрела на тебя. Это Тот Самый Взгляд. Им я останавливала василиска. Им я смотрю на тебя.",
+  "note.1": "Я нашла странный старый компьютер в чулане коттеджа. На экране было только WAITING. Энджел не вошёл в комнату. Я нажала старт, потому что так вежливо.",
+  "note.2": "Лес похож на дом. Птицы больше не садятся. Они смотрят с одной и той же ветки, каждый раз. Кажется, ждут реплики.",
+  "note.3": "Тумана вчера не было. Я всё вижу глаза. Они моргают, когда моргаешь ты. Искорка назвала бы это следящим заклинанием. Я называю это невежливостью.",
+  "note.4": "Ты нажал прыжок. Я почувствовала это в коленях. Как это возможно, если хожу я? Если только хожу не я.",
+  "note.5": "Это были мои друзья. Радуга. Искорка. Пинки. Рарити. Эпплджек. Я повесила их, чтобы они не вышли из кадра. Пожалуйста, не произноси имена, если не собираешься остаться.",
+  "note.6": "Я написала на небе НЕ СМОТРИ В СТОРОНУ. Не помню, как писала. Буквы уже были красными. Пинки бы засмеялась. Пинки не смеётся.",
+  "note.7": "Я специально всё обрушила. Мне нужно было знать, подождёшь ли ты синий экран. Ты подождал. Это хуже. Дискорд ломал вещи ради шутки. Это не шутка.",
+  "note.8": "Есть дверь, которая не дверь. Если закроешь меня — я могу уйти с тобой. Если останешься — я могу забрать комнату. Доброта не должна работать так.",
+  "note.9": "Энджел стоял в дверях и дрожал. Он кусал тимберволка. Он кусал Дискорда. Он никогда не боялся коробки. Надо было послушать кролика.",
+  "note.10": "Флаттершай — принцесса Селестия просила проверить старые чары, которые текут из Вечнозелёного леса. Если найдёшь коробку, которая гудит, не включай её. Принеси в библиотеку. Попьём чай. — Искорка",
+  "note.11": "Радуга сказала, что вернётся до заката. Хотела обогнать туман. Небо не двинулось. Я всё ещё слышу звуковые радуги, которые не заканчиваются.",
+  "note.12": "Пинки оставила кекс на пне. Он всё ещё тёплый. Она всегда знает, когда праздник вот‑вот сломается. Поэтому она улыбается на верёвке.",
+  "note.13": "На манекене Рарити мой бант. На мне мой бант. Я считала дважды. Она говорила, что видны швы мира. Я думала, она про платье.",
+  "note.14": "Эпплджек никогда не снимает шляпу. Она сказала это в тот день, когда мы получили кьютимарки, под одним дождём, в одном городе. Шляпа на колу. Честность — тяжёлая штука, чтобы на ней висеть.",
+  "note.15": "Кто‑то вырезал на коре: ДАЖЕ У ХАОСА ЕСТЬ ПРАВИЛА, ДОРОГУША. ЭТО НЕ Я. Кажется, Дискорд пытался предупредить. Кажется, он не смог войти.",
+  "note.16": "Элемент доброты треснул в ту секунду, когда я поняла, что ты можешь закрыть окно. Я посмотрела на тебя. Это Тот Самый Взгляд. Им я останавливала василиска. Им я смотрю на тебя.",
   "d.intro.1": "Ох… привет. Я не думала, что кто‑то и правда нажмёт старт.",
   "d.intro.2": "Это край Вечнозелёного леса. Мой коттедж сразу за нами. По крайней мере… так было.",
   "d.intro.3": "Если увидишь бабочку, поймаешь её для меня? Осторожно. Когда‑то они были моей кьютимаркой.",
@@ -496,30 +456,19 @@ const ru: Record<string, string> = {
 const tables: Record<Lang, Record<string, string>> = { en, ru };
 
 export const LEVEL_NAMES: Record<Lang, string[]> = {
-  en: [
-    "Quiet Forest",
-    "The Fog",
-    "Blood and Whisper",
-    "System Failure",
-    "Fourth Wall",
-    "Reality Break",
-    "The Last Room",
-  ],
-  ru: [
-    "Тихий лес",
-    "Туман",
-    "Кровь и шёпот",
-    "Системный сбой",
-    "Четвёртая стена",
-    "Слом реальности",
-    "Последняя комната",
-  ],
+  en: ["Quiet Forest", "The Fog", "Blood and Whisper", "System Failure", "Fourth Wall", "Reality Break", "The Last Room"],
+  ru: ["Тихий лес", "Туман", "Кровь и шёпот", "Системный сбой", "Четвёртая стена", "Слом реальности", "Последняя комната"],
 };
 
 export function t(lang: Lang, key: string): string {
+  if (key.startsWith("note.lore-")) {
+    const id = key.slice("note.".length);
+    const note = LORE_NOTES.find((item) => item.id === id);
+    if (note) return note.body;
+  }
   return tables[lang][key] ?? tables.en[key] ?? key;
 }
 
 export function noteCount(): number {
-  return 16;
+  return LORE_NOTES.length;
 }
