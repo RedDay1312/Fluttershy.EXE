@@ -98,6 +98,6 @@ useGameStore.subscribe((state) => {
   if (state.osWindow === lastWindow) return;
   lastWindow = state.osWindow;
   if (state.osWindow === "browser" && state.notes.length >= 2) { address("whisper.2", "open-browser"); playHorrorSfx("knock"); }
-  else if (state.osWindow === "notes" && state.notes.length >= 3) { address("whisper.3", "open-notes"); playHorrorSfx("type"); }
+  else if (state.osWindow === "notes" && state.notes.length >= 3) { address("whisper.3", "open-notes"); playHorrorSfx("knock"); }
   else if (state.osWindow === "docs" && state.level >= 4) { address("whisper.6", "open-docs"); playHorrorSfx("drone"); }
 });
