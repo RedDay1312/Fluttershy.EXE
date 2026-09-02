@@ -1,6 +1,7 @@
 import * as Phaser from "phaser";
 import { bridge } from "../bridge";
 import { EXPANDED_LEVELS } from "../levels-expanded";
+import { installEquestriaDetails } from "../equestria-details";
 
 export class PreloadScene extends Phaser.Scene {
   private loadErrors: string[] = [];
@@ -12,6 +13,8 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
+    installEquestriaDetails(EXPANDED_LEVELS);
+
     const w = this.scale.width;
     const h = this.scale.height;
     this.add.rectangle(0, 0, w, h, 0x07070a).setOrigin(0);
@@ -54,22 +57,15 @@ export class PreloadScene extends Phaser.Scene {
     const sheetKeys = new Set(sheets.map(([k]) => k));
 
     const svgImages = new Set([
-      "ponyville-cottage-new",
-      "ponyville-cottage-corrupt",
-      "cloud-rainbow-new",
-      "apple-basket-new",
-      "harmony-case-new",
-      "harmony-case-corrupt",
-      "equestria-road-sign-new",
-      "equestria-road-sign-corrupt",
+      "ponyville-cottage-new", "ponyville-cottage-corrupt", "cloud-rainbow-new", "apple-basket-new",
+      "harmony-case-new", "harmony-case-corrupt", "equestria-road-sign-new", "equestria-road-sign-corrupt",
     ]);
     const images = new Set([
       "fs-portrait", "fs-horror", "note", "flower", "door", "eyes", "spikes", "puddle", "flag",
       "plat-grass", "plat-wood", "plat-stone", "plat-blood", "plat-glitch", "plat-void",
       "tree-1", "tree-2", "tree-3", "bush", "grass", "rock", "mushroom", "vignette", "px",
       "fg-grass", "cottage", "sign", "letter", "cutie", "gem", "poster",
-      "hang-orange", "hang-pink", "hang-purple", "hang-yellow", "skull",
-      ...svgImages,
+      "hang-orange", "hang-pink", "hang-purple", "hang-yellow", "skull", ...svgImages,
     ]);
 
     for (const level of EXPANDED_LEVELS) {
