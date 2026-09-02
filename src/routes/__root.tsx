@@ -11,6 +11,7 @@ import pauseCss from "../pause-menu.css?url";
 import awarenessCss from "../player-awareness.css?url";
 import deathCss from "../death-reactions.css?url";
 import desktopHubCss from "../desktop-hub.css?url";
+import browserShortcutCss from "../browser-shortcut.css?url";
 
 const APP_NAME = "WAITING";
 
@@ -35,6 +36,7 @@ export const Route = createRootRoute({
       { rel: "stylesheet", href: awarenessCss },
       { rel: "stylesheet", href: deathCss },
       { rel: "stylesheet", href: desktopHubCss },
+      { rel: "stylesheet", href: browserShortcutCss },
       { rel: "manifest", href: "/__grok/manifest.webmanifest" },
       { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
       {
