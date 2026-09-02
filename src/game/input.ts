@@ -33,6 +33,12 @@ function activeCodes(): Set<string> {
   return held;
 }
 
+function resetEdges() {
+  prevJump = false;
+  prevPause = false;
+  prevInteract = false;
+}
+
 export function installInput(target: Window | Document = window) {
   const down = (e: KeyboardEvent) => {
     if (GAME_CODES.has(e.code)) e.preventDefault();
@@ -41,24 +47,31 @@ export function installInput(target: Window | Document = window) {
   const up = (e: KeyboardEvent) => {
     held.delete(e.code);
   };
-  const clear = () => held.clear();
+  const clear = () => {
+    held.clear();
+    resetEdges();
+  };
   const visibility = () => {
     if (document.hidden) clear();
+    else resetEdges();
   };
   target.addEventListener("keydown", down as EventListener);
   target.addEventListener("keyup", up as EventListener);
   window.addEventListener("blur", clear);
+  window.addEventListener("focus", resetEdges);
   document.addEventListener("visibilitychange", visibility);
   return () => {
     target.removeEventListener("keydown", down as EventListener);
     target.removeEventListener("keyup", up as EventListener);
     window.removeEventListener("blur", clear);
+    window.removeEventListener("focus", resetEdges);
     document.removeEventListener("visibilitychange", visibility);
   };
 }
 
 export function setInjectedKeys(codes: string[] | null) {
   injected = codes;
+  resetEdges();
 }
 
 export function setTouch(dir: "left" | "right" | "jump" | "down" | "interact", on: boolean) {
@@ -100,7 +113,5 @@ export function readActions(): Actions {
 export function clearInput() {
   held.clear();
   injected = null;
-  prevJump = false;
-  prevPause = false;
-  prevInteract = false;
+  resetEdges();
 }
