@@ -7,6 +7,8 @@ let currentBed = -1;
 let musicOn = true;
 let sfxOn = true;
 let visibilityBound = false;
+let hushToken = 0;
+let hushTimer: number | null = null;
 
 function ctxNow() { return bus?.ctx.currentTime ?? 0; }
 
@@ -28,6 +30,8 @@ export function setMusicEnabled(on: boolean) { musicOn = on; if (!bus) return; b
 export function setSfxEnabled(on: boolean) { sfxOn = on; if (!bus) return; bus.sfx.gain.setTargetAtTime(on ? 0.4 : 0, ctxNow(), 0.02); }
 
 function stopMusic() {
+  hushToken++;
+  if (hushTimer !== null) { window.clearTimeout(hushTimer); hushTimer = null; }
   musicNodes.forEach((n) => { try { n.disconnect(); } catch { /* already gone */ } }); musicNodes = [];
   if (musicTimer) { window.clearInterval(musicTimer); musicTimer = null; }
 }
@@ -108,4 +112,14 @@ export function setMusicBed(level: number) {
   else { pad(49, "sawtooth", 0.03); pad(73, "square", 0.012); pad(155, "triangle", 0.02); }
 }
 
-export function hushMusic(seconds = 0.4) { if (!bus || !musicOn) return; bus.music.gain.setTargetAtTime(0.02, ctxNow(), seconds / 4); window.setTimeout(() => { if (bus && musicOn) bus.music.gain.setTargetAtTime(0.22, ctxNow(), 0.4); }, seconds * 1000); }
+export function hushMusic(seconds = 0.4) {
+  if (!bus || !musicOn) return;
+  const token = ++hushToken;
+  if (hushTimer !== null) window.clearTimeout(hushTimer);
+  bus.music.gain.setTargetAtTime(0.02, ctxNow(), Math.max(0.02, seconds / 4));
+  hushTimer = window.setTimeout(() => {
+    hushTimer = null;
+    if (token !== hushToken || !bus || !musicOn) return;
+    bus.music.gain.setTargetAtTime(0.22, ctxNow(), 0.4);
+  }, Math.max(0, seconds * 1000));
+}
