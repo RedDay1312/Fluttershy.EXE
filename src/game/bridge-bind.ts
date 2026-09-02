@@ -1,5 +1,5 @@
 import { bridge } from "./bridge";
-import { useGameStore } from "@/store/game-store";
+import { useGameStore } from "../store/game-store";
 
 /** Connect Phaser/browser bridge events to the React game store. */
 export function bindBridge() {
