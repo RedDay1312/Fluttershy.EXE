@@ -1,0 +1,106 @@
+/* Adaptive fourth-wall commentary shown while the game is paused. */
+.player-awareness {
+  position: fixed;
+  right: clamp(16px, 3vw, 42px);
+  bottom: clamp(16px, 4vh, 42px);
+  z-index: 70;
+  width: min(390px, calc(100vw - 32px));
+  pointer-events: none;
+  padding: 13px 15px 14px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-left: 2px solid rgba(67, 238, 202, 0.4);
+  background: linear-gradient(135deg, rgba(8, 13, 17, 0.94), rgba(3, 6, 9, 0.9));
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.58), inset 0 0 0 1px rgba(67, 238, 202, 0.025);
+  backdrop-filter: blur(5px);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  animation: player-awareness-in 180ms ease-out both;
+}
+
+.player-awareness__label {
+  margin-bottom: 7px;
+  color: rgba(67, 238, 202, 0.46);
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.player-awareness p {
+  margin: 0;
+  color: rgba(231, 242, 239, 0.82);
+  font-size: 12px;
+  line-height: 1.55;
+  letter-spacing: 0.025em;
+}
+
+.player-awareness__dot {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(67, 238, 202, 0.7);
+  box-shadow: 0 0 9px rgba(67, 238, 202, 0.42);
+  animation: player-awareness-blink 2.4s steps(1, end) infinite;
+}
+
+.player-awareness.is-aware {
+  border-left-color: rgba(255, 174, 87, 0.5);
+}
+
+.player-awareness.is-aware .player-awareness__label {
+  color: rgba(255, 174, 87, 0.52);
+}
+
+.player-awareness.is-aware .player-awareness__dot {
+  background: rgba(255, 174, 87, 0.78);
+  box-shadow: 0 0 10px rgba(255, 174, 87, 0.45);
+}
+
+.player-awareness.is-terrifying {
+  border-color: rgba(255, 59, 92, 0.2);
+  border-left-color: rgba(255, 59, 92, 0.82);
+  background: linear-gradient(135deg, rgba(18, 8, 12, 0.96), rgba(6, 4, 7, 0.94));
+  box-shadow: 0 20px 65px rgba(0, 0, 0, 0.68), 0 0 30px rgba(255, 59, 92, 0.035), inset 0 0 0 1px rgba(255, 59, 92, 0.025);
+}
+
+.player-awareness.is-terrifying .player-awareness__label {
+  color: rgba(255, 108, 132, 0.64);
+}
+
+.player-awareness.is-terrifying p {
+  color: rgba(255, 226, 231, 0.9);
+  text-shadow: 0 0 12px rgba(255, 59, 92, 0.06);
+}
+
+.player-awareness.is-terrifying .player-awareness__dot {
+  background: rgba(255, 59, 92, 0.86);
+  box-shadow: 0 0 11px rgba(255, 59, 92, 0.5);
+}
+
+@keyframes player-awareness-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes player-awareness-blink {
+  0%, 58%, 100% { opacity: 1; }
+  59%, 66% { opacity: 0.16; }
+}
+
+@media (max-width: 520px) {
+  .player-awareness {
+    right: 10px;
+    bottom: 10px;
+    width: calc(100vw - 20px);
+    padding: 11px 13px 12px 15px;
+  }
+  .player-awareness p { font-size: 11px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player-awareness,
+  .player-awareness__dot {
+    animation: none;
+  }
+}
