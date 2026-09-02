@@ -203,7 +203,7 @@ function closeBehindFlash() {
   window.setTimeout(()=>{horrorBusy=false;},620);
 }
 
-deathBurst() { const layer=horrorLayer(420); if(!layer)return; Object.assign(layer.style,{background:"radial-gradient(circle at 50% 50%, rgba(255,255,255,.35), rgba(95,0,0,.45) 30%, rgba(0,0,0,.94) 85%)",mixBlendMode:"normal"}); }
+function deathBurst(){const layer=horrorLayer(420);if(!layer)return;Object.assign(layer.style,{background:"radial-gradient(circle at 50% 50%, rgba(255,255,255,.35), rgba(95,0,0,.45) 30%, rgba(0,0,0,.94) 85%)",mixBlendMode:"normal"});}
 function shakeScreen(){if(typeof document==="undefined")return;document.body.animate([{transform:"translate(0,0)"},{transform:"translate(-7px,2px)"},{transform:"translate(5px,-3px)"},{transform:"translate(-3px,1px)"},{transform:"translate(0,0)"}],{duration:230,easing:"steps(4,end)"});}
 
 function surpriseEvent(level: number) {
