@@ -1,0 +1,1 @@
+Adds recurring Ponyville/Fluttershy environmental motifs using existing project art: cottages, flowers, butterflies and cutie-mark symbols. The healthy early sections are more colorful and familiar; later corrupted sections deliberately retain those motifs as broken anchors so the horror is recognizably Equestrian rather than generic.
