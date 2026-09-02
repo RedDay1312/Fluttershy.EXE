@@ -53,20 +53,31 @@ export class PreloadScene extends Phaser.Scene {
     sheets.forEach(([k, u, fw, fh]) => this.load.spritesheet(k, u, { frameWidth: fw, frameHeight: fh }));
     const sheetKeys = new Set(sheets.map(([k]) => k));
 
+    const svgImages = new Set([
+      "ponyville-cottage-new",
+      "ponyville-cottage-corrupt",
+      "cloud-rainbow-new",
+      "apple-basket-new",
+      "harmony-case-new",
+      "harmony-case-corrupt",
+      "equestria-road-sign-new",
+      "equestria-road-sign-corrupt",
+    ]);
     const images = new Set([
       "fs-portrait", "fs-horror", "note", "flower", "door", "eyes", "spikes", "puddle", "flag",
       "plat-grass", "plat-wood", "plat-stone", "plat-blood", "plat-glitch", "plat-void",
       "tree-1", "tree-2", "tree-3", "bush", "grass", "rock", "mushroom", "vignette", "px",
       "fg-grass", "cottage", "sign", "letter", "cutie", "gem", "poster",
       "hang-orange", "hang-pink", "hang-purple", "hang-yellow", "skull",
+      ...svgImages,
     ]);
 
-    // Level data is the source of truth for decorative textures.
     for (const level of EXPANDED_LEVELS) {
       for (const decor of level.decor) images.add(decor.sprite);
     }
     images.forEach((k) => {
-      if (!sheetKeys.has(k)) this.load.image(k, `/sprites/${k}.png`);
+      if (sheetKeys.has(k)) return;
+      this.load.image(k, `/sprites/${k}.${svgImages.has(k) ? "svg" : "png"}`);
     });
 
     const pngMaps = new Set(["fog-overlay", "blood-fog"]);
