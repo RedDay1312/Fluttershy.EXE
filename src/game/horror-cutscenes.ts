@@ -7,7 +7,7 @@ let lastScene = -1;
 let sceneTimer: number | null = null;
 let kickoffTimer: number | null = null;
 let keyHandler: ((e: KeyboardEvent) => void) | null = null;
-let timers = new Set<number>();
+const timers = new Set<number>();
 
 // Each scene advances the same story instead of being an isolated scare:
 // silence -> imitation -> observation -> pursuit -> loss of control -> identity theft.
