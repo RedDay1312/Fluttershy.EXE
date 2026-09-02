@@ -15,6 +15,7 @@ const MAX_SPEED = 310;
 const CUT = 0.48;
 const WALL_JUMP = -780;
 const RESPAWN_INVULN = 1250;
+const VISUAL_BASE = 112;
 
 export class Pony {
   sprite: Phaser.Physics.Arcade.Sprite;
@@ -35,11 +36,13 @@ export class Pony {
   onLand?: () => void;
   onJump?: () => void;
   onLook?: () => void;
+  private feedbackTween?: Phaser.Tweens.Tween;
+  private landingKick = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     this.sprite = scene.physics.add.sprite(x, y, "fs-idle", 0);
     this.sprite.setDepth(20);
-    this.sprite.setDisplaySize(112, 112);
+    this.sprite.setDisplaySize(VISUAL_BASE, VISUAL_BASE);
     this.sprite.setSize(48, 38);
     this.sprite.setOffset(40, 78);
     this.sprite.setMaxVelocity(MAX_SPEED, MAX_FALL);
@@ -145,8 +148,6 @@ export class Pony {
   }
 
   hurt() {
-    // Death is marked before the hurt animation is requested by PlayScene.
-    // Do not reject the visual damage feedback just because dead=true.
     if (this.hurtT > 0 || this.invulnerableMs > 0) return;
     this.hurtT = 420;
     this.sprite.play("fs-hurt-anim", true);
@@ -159,6 +160,7 @@ export class Pony {
   respawn(x: number, y: number) {
     const safe = this.findSafeRespawn(this.sprite.scene, x, y);
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
+    this.killFeedbackTween();
     this.dead = false;
     this.hurtT = 0;
     this.looking = false;
@@ -170,6 +172,7 @@ export class Pony {
     this.wasGrounded = false;
     this.invulnerableMs = RESPAWN_INVULN;
     this.jumpHeldPrev = false;
+    this.landingKick = 0;
     this.sprite.setPosition(safe.x, safe.y);
     body.reset(safe.x, safe.y);
     body.setEnable(true);
@@ -178,6 +181,7 @@ export class Pony {
     this.sprite.setAlpha(1);
     this.sprite.clearTint();
     this.sprite.setFlipY(false);
+    this.sprite.setScale(1, 1);
   }
 
   grounded(): boolean {
@@ -196,6 +200,7 @@ export class Pony {
     } else if (this.sprite.alpha !== 1) {
       this.sprite.setAlpha(1);
     }
+    this.landingKick = Math.max(0, this.landingKick - ms);
 
     if (this.locked || this.dead) {
       body.setVelocityX(0);
@@ -228,6 +233,7 @@ export class Pony {
       body.setVelocityY(JUMP_V * this.gravitySign);
       this.coyote = 0;
       this.buffer = 0;
+      this.playJumpFeedback();
       this.onJump?.();
     } else if (this.canWallJump && this.buffer > 0 && !onGround) {
       const wallL = body.blocked.left || body.touching.left;
@@ -240,6 +246,7 @@ export class Pony {
         this.sprite.setFlipX(this.facing < 0);
         this.buffer = 0;
         this.coyote = 0;
+        this.playJumpFeedback();
         this.onJump?.();
       }
     }
@@ -257,10 +264,43 @@ export class Pony {
     if (this.gravitySign > 0 && body.velocity.y > MAX_FALL) body.setVelocityY(MAX_FALL);
     if (this.gravitySign < 0 && body.velocity.y < -MAX_FALL) body.setVelocityY(-MAX_FALL);
 
-    if (onGround && !this.wasGrounded) this.onLand?.();
+    if (onGround && !this.wasGrounded) {
+      if (Math.abs(body.velocity.x) > 70 || Math.abs(body.velocity.y) > 260) this.playLandingFeedback();
+      this.onLand?.();
+    }
     this.wasGrounded = onGround;
 
     this.animate(onGround, body.velocity.x, body.velocity.y);
+  }
+
+  private playJumpFeedback() {
+    this.killFeedbackTween();
+    this.sprite.setScale(0.91, 1.08);
+    this.feedbackTween = this.sprite.scene.tweens.add({
+      targets: this.sprite,
+      scaleX: 1,
+      scaleY: 1,
+      duration: 150,
+      ease: "Quad.easeOut",
+    });
+  }
+
+  private playLandingFeedback() {
+    this.killFeedbackTween();
+    this.landingKick = 120;
+    this.sprite.setScale(1.1, 0.9);
+    this.feedbackTween = this.sprite.scene.tweens.add({
+      targets: this.sprite,
+      scaleX: 1,
+      scaleY: 1,
+      duration: 180,
+      ease: "Back.easeOut",
+    });
+  }
+
+  private killFeedbackTween() {
+    this.feedbackTween?.stop();
+    this.feedbackTween = undefined;
   }
 
   private animate(onGround: boolean, vx: number, vy: number) {
