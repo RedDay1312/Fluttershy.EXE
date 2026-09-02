@@ -106,14 +106,39 @@ function addGroundSpikes(platforms: Plat[], offset: number, level: number, pass:
   return hazards;
 }
 
+function supportedCheckpoint(c: { x: number; y: number }, platforms: Plat[]): boolean {
+  return platforms.some((p) => {
+    if (p.w < 70) return false;
+    const left = p.x + 18, right = p.x + p.w - 18;
+    const top = p.y;
+    return c.x >= left && c.x <= right && Math.abs((top - 104) - c.y) < 150;
+  });
+}
+
+function sanitizeCheckpoints(checkpoints: LevelDef["checkpoints"], platforms: Plat[]): LevelDef["checkpoints"] {
+  const result: LevelDef["checkpoints"] = [];
+  const seen = new Set<string>();
+  for (const c of checkpoints) {
+    if (!Number.isFinite(c.x) || !Number.isFinite(c.y)) continue;
+    if (!supportedCheckpoint(c, platforms)) continue;
+    const key = `${Math.round(c.x)}:${Math.round(c.y)}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(c);
+  }
+  return result;
+}
+
 export const EXPANDED_LEVELS: LevelDef[] = LEVELS.map((level) => {
   const section = level.width, offsets = [section, section * 2, section * 3];
   const echoPlatforms = offsets.flatMap((offset, index) => clonePlatforms(level.platforms, offset, index + 1));
+  const allPlatforms = [...level.platforms, ...echoPlatforms];
   const echoHazards = offsets.flatMap((offset) => cloneHazards(level.hazards, offset));
   const extraHazards = offsets.flatMap((offset, index) => addGroundSpikes(clonePlatforms(level.platforms, offset, index + 1), offset, level.id, index + 1));
   const echoPickups = offsets.flatMap((offset, index) => clonePickups(level.pickups, offset, level.id, index + 1));
   const echoDecor = offsets.flatMap((offset, index) => [...cloneDecor(level.decor, offset, index + 1), ...atmosphericDecor(level, offset, index + 1)]);
   const echoEvents = offsets.flatMap((offset, index) => makeEchoTriggers(level, offset, index + 1));
-  return { ...level, width: section * 4, exit: { ...level.exit, x: section * 4 - 150 }, platforms: [...level.platforms, ...echoPlatforms], hazards: [...level.hazards, ...echoHazards, ...extraHazards], pickups: [...curatePickups(level.pickups), ...echoPickups], decor: [...level.decor, ...atmosphericDecor(level, 0, 0), ...echoDecor], triggers: [...level.triggers, ...echoEvents], checkpoints: [...level.checkpoints, ...offsets.flatMap((offset) => level.checkpoints.map((c) => ({ x: c.x + offset, y: c.y })))] };
+  const checkpoints = sanitizeCheckpoints([...level.checkpoints, ...offsets.flatMap((offset) => level.checkpoints.map((c) => ({ x: c.x + offset, y: c.y })))], allPlatforms);
+  return { ...level, width: section * 4, exit: { ...level.exit, x: section * 4 - 150 }, platforms: allPlatforms, hazards: [...level.hazards, ...echoHazards, ...extraHazards], pickups: [...curatePickups(level.pickups), ...echoPickups], decor: [...level.decor, ...atmosphericDecor(level, 0, 0), ...echoDecor], triggers: [...level.triggers, ...echoEvents], checkpoints };
 });
 export function getExpandedLevel(id: number): LevelDef { return EXPANDED_LEVELS.find((level) => level.id === id) ?? EXPANDED_LEVELS[0]; }
