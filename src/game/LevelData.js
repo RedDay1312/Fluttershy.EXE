@@ -1,71 +1,21 @@
 export const CHAPTERS = [
-  {
-    id: 'garden', title: 'I. ТИХИЙ САД', subtitle: 'Здесь ещё можно было вернуться.',
-    sky: 'garden-sky', far: 'garden-far', platform: 'grass', fog: false,
-    width: 3600, spawn: { x: 180, y: 520 }, required: 2,
-    shards: [650, 1350, 2050, 2860],
-    platforms: [
-      [420, 590, 420], [900, 500, 260], [1300, 600, 320], [1700, 470, 250],
-      [2110, 565, 320], [2500, 455, 240], [2890, 575, 380], [3320, 500, 220],
-    ],
-    hazards: [760, 1510, 2310, 3160],
-    threatAt: 2200,
-    message: 'Сад помнит шаги. Только не твои.',
-  },
-  {
-    id: 'fog', title: 'II. ТУМАННЫЙ ПУТЬ', subtitle: 'В тумане расстояние перестаёт иметь смысл.',
-    sky: 'fog-sky', far: 'fog-far', platform: 'stone', fog: true,
-    width: 3900, spawn: { x: 180, y: 520 }, required: 3,
-    shards: [560, 1180, 1820, 2580, 3280],
-    platforms: [
-      [360, 585, 360], [780, 500, 260], [1160, 610, 300], [1510, 470, 260],
-      [1910, 550, 340], [2320, 450, 280], [2720, 590, 350], [3160, 490, 260], [3500, 565, 280],
-    ],
-    hazards: [930, 1430, 2150, 2940, 3610],
-    threatAt: 2350,
-    message: 'Ты слышишь дыхание впереди. И сзади.',
-  },
-  {
-    id: 'glitch', title: 'III. РАЗРЫВ', subtitle: 'Система больше не делает вид, что это игра.',
-    sky: 'void-sky', far: 'glitch-far', platform: 'void', fog: true,
-    width: 4200, spawn: { x: 180, y: 520 }, required: 4,
-    shards: [520, 1160, 1780, 2420, 3050, 3620],
-    platforms: [
-      [360, 590, 340], [760, 465, 250], [1100, 605, 300], [1450, 500, 250],
-      [1810, 430, 270], [2180, 570, 310], [2590, 465, 270], [2940, 600, 320],
-      [3330, 490, 280], [3700, 575, 300],
-    ],
-    hazards: [840, 1300, 2050, 2450, 3180, 3820],
-    threatAt: 2150,
-    message: 'Не смотри на небо. Там больше нет неба.',
-  },
-  {
-    id: 'blood', title: 'IV. ПОСЛЕДНИЙ САД', subtitle: 'Конец уже случился. Осталось понять, для кого.',
-    sky: 'blood-sky', far: 'blood-far', platform: 'blood', fog: true,
-    width: 4400, spawn: { x: 180, y: 520 }, required: 5,
-    shards: [500, 1050, 1630, 2250, 2910, 3490, 4020],
-    platforms: [
-      [350, 600, 340], [710, 490, 260], [1080, 570, 310], [1450, 445, 250],
-      [1800, 590, 320], [2200, 470, 290], [2580, 560, 300], [2960, 450, 280],
-      [3330, 590, 330], [3740, 475, 300], [4090, 575, 250],
-    ],
-    hazards: [820, 1290, 1910, 2480, 3080, 3630],
-    threatAt: 2050,
-    message: 'Она ждала тебя здесь задолго до того, как ты пришла.',
-  },
+  {name:'I — ТИШИНА',tone:0x8b9270,length:5200,goal:3,platform:'grass',decor:['flower','tree1'],message:'Сад слишком тихий.'},
+  {name:'II — ПРИСЛУШИВАЙСЯ',tone:0x59656d,length:5600,goal:4,platform:'stone',decor:['eyes','tree2'],message:'Иногда звук приходит раньше того, кто его издаёт.'},
+  {name:'III — НЕ СМОТРИ',tone:0x4e4659,length:6000,goal:5,platform:'void',decor:['hangPink','hangPurple','skull'],message:'Она начинает замечать, что ты смотришь.'},
+  {name:'IV — ДОМОЙ',tone:0x632e32,length:6400,goal:6,platform:'blood',decor:['hangOrange','hangYellow','hangWhite'],message:'Дом больше не там, где был.'}
 ];
 
-export const ENDINGS = {
-  good: {
-    title: 'ТЫ ВСПОМНИЛА',
-    text: 'Память не вернула прошлое. Она вернула тебе выбор.\nСистема закрылась, а тишина впервые стала настоящей.',
-  },
-  broken: {
-    title: 'НЕ ВСЁ ПРОПАЛО',
-    text: 'Ты нашла достаточно, чтобы увидеть правду.\nНо не достаточно, чтобы выйти из неё целиком.',
-  },
-  bad: {
-    title: 'НОВАЯ СТРАНИЦА',
-    text: 'Ты бежала от сада, но не от того, что было внутри него.\nКогда экран погас, курсор продолжил мигать.',
-  },
-};
+export function getChapter(index){ return CHAPTERS[Math.max(0,Math.min(index,CHAPTERS.length-1))]; }
+
+export function buildLayout(index){
+  const c=getChapter(index), list=[];
+  const segment=c.length/10;
+  for(let i=0;i<10;i++){
+    const x=Math.floor(segment*i+320);
+    list.push({x,y:470-(i%3)*70,w:Phaser.Math.Between(280,560),h:28});
+    if(i>0) list.push({x:x+Phaser.Math.Between(110,260),y:300-(i%2)*45,w:190,h:24});
+  }
+  const memories=Array.from({length:c.goal},(_,i)=>({x:700+i*((c.length-1300)/Math.max(1,c.goal-1)),y:220+(i%2)*105}));
+  const traps=Array.from({length:6+index*2},(_,i)=>({x:900+i*((c.length-1200)/Math.max(1,5+index)),y:555,w:54,h:24}));
+  return {platforms:list,memories,traps,exitX:c.length-260};
+}
