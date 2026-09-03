@@ -1,0 +1,16 @@
+import { AudioEngine } from './AudioEngine.js';
+
+export class HorrorDirector{
+  constructor(scene){this.scene=scene;this.phase=0;this.nextBeat=2600;this.lastX=0;}
+  update(dt,player,state){
+    const moving=Math.abs(player.body.velocity.x)>80;
+    state.fear=Math.min(100,state.fear+dt*(moving?0.004:0.0012));
+    if(player.x-this.lastX>250){state.fear=Math.min(100,state.fear+3);this.lastX=player.x;}
+    this.nextBeat-=dt;
+    if(this.nextBeat<=0){this.nextBeat=Phaser.Math.Between(2800,5200); if(state.fear>45) this.whisper();}
+    if(state.fear>75&&this.phase<2){this.phase=2;this.scene.spawnStalker();AudioEngine.scare();}
+    else if(state.fear>55&&this.phase<1){this.phase=1;this.scene.spawnEyes();}
+  }
+  whisper(){this.scene.cameras.main.shake(180,Math.min(.004,state.fear/25000));}
+  reset(){this.phase=0;this.nextBeat=3000;}
+}
