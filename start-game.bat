@@ -1,26 +1,16 @@
 @echo off
-setlocal
+setlocal EnableExtensions
 cd /d "%~dp0"
-chcp 65001 >nul
-
+title FLUTTERSHY.EXE // REBORN
+color 0F
+cls
 echo.
-echo ========================================
-echo       FLUTTERSHY.EXE - CLEAN BUILD
-echo ========================================
+echo ============================================================
+echo             FLUTTERSHY.EXE // REBORN
+echo                    CLEAN BUILD
+ echo ============================================================
 echo.
-
-if not exist "node_modules" (
-  echo Installing dependencies...
-  call npm install
-  if errorlevel 1 (
-    echo.
-    echo ERROR: npm install failed.
-    pause
-    exit /b 1
-  )
-)
-
-echo Starting local game...
-echo Close this window to stop the server.
-echo.
+where node >nul 2>&1 || (echo Node.js 20+ is required.&pause&exit /b 1)
+if not exist node_modules (echo Installing dependencies...&call npm install&if errorlevel 1 (echo Install failed.&pause&exit /b 1))
+echo Starting local game server...
 call npm run dev
