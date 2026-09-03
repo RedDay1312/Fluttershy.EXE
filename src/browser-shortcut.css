@@ -1,7 +1,0 @@
-.desktop-browser-shortcut{box-sizing:border-box;width:80px;height:78px;padding:5px 4px;margin:0;line-height:1;}
-.desktop-browser-shortcut .desktop-browser-icon{display:flex;align-items:center;justify-content:center;width:48px;height:48px;flex:0 0 48px;margin:0 auto;}
-.desktop-browser-shortcut .desktop-browser-icon span{display:none;}
-.desktop-browser-shortcut .desktop-browser-icon img{display:block;width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 3px 5px rgb(0 0 0 / 0.38));}
-.desktop-browser-shortcut > .leading-tight{display:block;max-width:76px;margin:0 auto;line-height:1.15;}
-@media (min-width:640px){.desktop-browser-shortcut{width:80px;height:78px;}}
-.os-desktop.is-corrupt .desktop-browser-shortcut .desktop-browser-icon img{filter:drop-shadow(0 0 7px rgb(154 36 48 / 0.45)) saturate(.78);}
