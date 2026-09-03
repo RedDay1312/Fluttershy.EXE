@@ -2,7 +2,5 @@ node_modules/
 dist/
 .vite/
 .DS_Store
-Thumbs.db
 *.log
-.env
-.env.*
+npm-debug.log*
