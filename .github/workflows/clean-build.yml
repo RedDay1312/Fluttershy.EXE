@@ -1,23 +1,21 @@
-name: clean-build
-
+name: rebuild-check
 on:
   push:
-    branches: [main, full-rewrite-v1]
+    branches: [main, full-rebuild-v2]
   pull_request:
     branches: [main]
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Node
+      - name: Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
           cache: npm
       - name: Install
         run: npm install
-      - name: Build
+      - name: Production build
         run: npm run build
