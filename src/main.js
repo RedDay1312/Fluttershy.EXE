@@ -4,7 +4,7 @@ import { MenuScene } from './game/MenuScene.js';
 import { GameScene } from './game/GameScene.js';
 import { FinaleScene } from './game/FinaleScene.js';
 import { AudioEngine } from './game/AudioEngine.js';
-import '../styles.css';
+import './styles.css';
 
 const config = {
   type: Phaser.AUTO,
