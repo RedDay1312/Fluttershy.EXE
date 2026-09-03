@@ -1,46 +1,28 @@
 import Phaser from 'phaser';
 
 export class BootScene extends Phaser.Scene {
-  constructor() { super('BootScene'); }
-
-  preload() {
-    this.load.setPath('/');
+  constructor(){ super('boot'); }
+  preload(){
+    const assets = [
+      ['flutter','sprites/fs-idle.png'],['run','sprites/fs-run.png'],['jump','sprites/fs-jump.png'],
+      ['hurt','sprites/fs-hurt.png'],['horror','sprites/fs-horror.png'],['look','sprites/fs-look.png'],
+      ['memory','sprites/gem.png'],['door','sprites/door.png'],['spikes','sprites/spikes.png'],
+      ['grass','sprites/plat-grass.png'],['stone','sprites/plat-stone.png'],['void','sprites/plat-void.png'],
+      ['blood','sprites/plat-blood.png'],['eyes','sprites/eyes.png'],['flower','sprites/flower.png'],
+      ['skull','sprites/skull.png'],['mushroom','sprites/mushroom.png'],['rock','sprites/rock.png'],
+      ['tree1','sprites/tree-1.png'],['tree2','sprites/tree-2.png'],['tree3','sprites/tree-3.png'],
+      ['hangPink','sprites/hang-pink.png'],['hangPurple','sprites/hang-purple.png'],['hangOrange','sprites/hang-orange.png'],
+      ['hangYellow','sprites/hang-yellow.png'],['hangBlue','sprites/hang-blue.png'],['hangWhite','sprites/hang-white.png'],
+      ['fog','sprites/vignette.png']
+    ];
+    for (const [key,path] of assets) this.load.image(key, `/${path}`);
     const bar = this.add.graphics();
-    const label = this.add.text(640, 360, 'LOADING CLEAN BUILD…', {
-      fontFamily: 'monospace', fontSize: '18px', color: '#d7d1c8',
-    }).setOrigin(0.5);
-    this.load.on('progress', (value) => {
-      bar.clear(); bar.fillStyle(0xd7d1c8, 1); bar.fillRect(440, 395, 400 * value, 5);
+    this.load.on('progress', value => {
+      bar.clear().fillStyle(0x6e7a55,1).fillRect(190,385,900*value,5);
     });
-    this.load.on('complete', () => { bar.destroy(); label.destroy(); });
-
-    this.load.image('menu-bg', 'maps/desktop-wallpaper.jpg');
-    this.load.image('finale-sky', 'maps/finale-sky.jpg');
-    this.load.image('garden-sky', 'maps/forest-sky.jpg');
-    this.load.image('garden-far', 'maps/forest-far.jpg');
-    this.load.image('fog-sky', 'maps/fog-sky.jpg');
-    this.load.image('fog-far', 'maps/fog-far.jpg');
-    this.load.image('glitch-far', 'maps/glitch-far.jpg');
-    this.load.image('void-sky', 'maps/void-sky.jpg');
-    this.load.image('blood-sky', 'maps/blood-sky.jpg');
-    this.load.image('blood-far', 'maps/blood-far.jpg');
-    this.load.image('fog-overlay', 'maps/fog-overlay.png');
-
-    this.load.image('player-idle', 'sprites/fs-idle.png');
-    this.load.image('player-look-1', 'sprites/fs-look-1.png');
-    this.load.image('player-look-2', 'sprites/fs-look-2.png');
-    this.load.image('player-look-3', 'sprites/fs-look-3.png');
-    this.load.image('player-look-4', 'sprites/fs-look-4.png');
-    this.load.image('player-hurt', 'sprites/fs-hurt.png');
-    this.load.image('threat', 'sprites/fs-distorted.png');
-    this.load.image('gem', 'sprites/gem.png');
-    this.load.image('spikes', 'sprites/spikes.png');
-    this.load.image('door', 'sprites/door.png');
-    this.load.image('plat-grass', 'sprites/plat-grass.png');
-    this.load.image('plat-stone', 'sprites/plat-stone.png');
-    this.load.image('plat-void', 'sprites/plat-void.png');
-    this.load.image('plat-blood', 'sprites/plat-blood.png');
   }
-
-  create() { this.scene.start('MenuScene'); }
+  create(){
+    this.registry.set('booted', true);
+    this.scene.start('menu');
+  }
 }
